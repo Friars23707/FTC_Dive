@@ -26,9 +26,10 @@ public class SingleArm extends LinearOpMode {
     private DcMotor rightFrontDrive = null;
     private DcMotor rightBackDrive = null;
     private Servo claw = null;
+    private Servo wrist = null;
 
     @Override
-    public void runOpMode() {
+    public void runOpMode() throws InterruptedException {
 
         // Initialize the hardware variables. Note that the strings used here must correspond
         // to the names assigned during the robot configuration step on the DS or RC devices.
@@ -37,6 +38,7 @@ public class SingleArm extends LinearOpMode {
         rightFrontDrive = hardwareMap.get(DcMotor.class, "front_right");
         rightBackDrive = hardwareMap.get(DcMotor.class, "back_right");
         claw = hardwareMap.get(Servo.class, "claw");
+        wrist = hardwareMap.get(Servo.class, "wrist");
 
 
         leftFrontDrive.setDirection(DcMotor.Direction.REVERSE);
@@ -68,6 +70,11 @@ public class SingleArm extends LinearOpMode {
             double rightBackPower  = axial + lateral - yaw;
 
             double clawPower = 0.5;
+            double wristPower = wrist.getPosition();
+            
+            final double WRIST_FOLDED_IN   = 0.8333;
+            final double WRIST_FOLDED_OUT  = 0.5;
+
 
             // Normalize the values so no wheel power exceeds 100%
             // This ensures that the robot maintains the desired motion.
@@ -105,19 +112,27 @@ public class SingleArm extends LinearOpMode {
             leftBackDrive.setPower(leftBackPower);
             rightBackDrive.setPower(rightBackPower);
 
-            if (gamepad1.dpad_up) {
+            if (gamepad2.dpad_up) {
                 clawPower = 1.0;
-            } else if (gamepad1.dpad_down) {
+            } else if (gamepad2.dpad_down) {
                 clawPower = 0.0;
             } else {
                 clawPower = 0.5;
             }
 
+            if (gamepad2.dpad_left) {
+                wristPower = (WRIST_FOLDED_IN);
+            } else if (gamepad2.dpad_right) {
+                wristPower = (WRIST_FOLDED_OUT);
+            }
 
+            // wristPower = gamepad2.dpad_left ? 1 : 0;
             // claw.setDirection(Servo.Direction.FORWARD);
             claw.setPosition(clawPower);
+            wrist.setPosition(wristPower);
 
             // Show the elapsed game time and wheel power.
+            telemetry.addData("Wrist", wrist.getPosition());
             telemetry.addData("Claw Input", clawPower);
             telemetry.addData("Claw", claw.getPosition());
             telemetry.addData("Status", "Run Time: " + runtime.toString());
