@@ -5,12 +5,14 @@ Made for the FTC 2024-25 game, Into the Deep
 
 */
 
-package org.firstinspires.ftc.robotcontroller.external.samples;
+package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
+import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 
@@ -23,16 +25,18 @@ public class SingleArm extends LinearOpMode {
     private DcMotor leftBackDrive = null;
     private DcMotor rightFrontDrive = null;
     private DcMotor rightBackDrive = null;
+    private Servo claw = null;
 
     @Override
     public void runOpMode() {
 
         // Initialize the hardware variables. Note that the strings used here must correspond
         // to the names assigned during the robot configuration step on the DS or RC devices.
-        leftFrontDrive  = hardwareMap.get(DcMotor.class, "left_front_drive");
-        leftBackDrive  = hardwareMap.get(DcMotor.class, "left_back_drive");
-        rightFrontDrive = hardwareMap.get(DcMotor.class, "right_front_drive");
-        rightBackDrive = hardwareMap.get(DcMotor.class, "right_back_drive");
+        leftFrontDrive  = hardwareMap.get(DcMotor.class, "front_left");
+        leftBackDrive  = hardwareMap.get(DcMotor.class, "back_left");
+        rightFrontDrive = hardwareMap.get(DcMotor.class, "front_right");
+        rightBackDrive = hardwareMap.get(DcMotor.class, "back_right");
+        claw = hardwareMap.get(Servo.class, "claw");
 
 
         leftFrontDrive.setDirection(DcMotor.Direction.REVERSE);
@@ -63,6 +67,8 @@ public class SingleArm extends LinearOpMode {
             double leftBackPower   = axial - lateral + yaw;
             double rightBackPower  = axial + lateral - yaw;
 
+            double clawPower = 0.5;
+
             // Normalize the values so no wheel power exceeds 100%
             // This ensures that the robot maintains the desired motion.
             max = Math.max(Math.abs(leftFrontPower), Math.abs(rightFrontPower));
@@ -86,12 +92,12 @@ public class SingleArm extends LinearOpMode {
             //      the setDirection() calls above.
             // Once the correct motors move in the correct direction re-comment this code.
 
-            /*
+
             leftFrontPower  = gamepad1.x ? 1.0 : 0.0;  // X gamepad
             leftBackPower   = gamepad1.a ? 1.0 : 0.0;  // A gamepad
             rightFrontPower = gamepad1.y ? 1.0 : 0.0;  // Y gamepad
             rightBackPower  = gamepad1.b ? 1.0 : 0.0;  // B gamepad
-            */
+
 
             // Send calculated power to wheels
             leftFrontDrive.setPower(leftFrontPower);
@@ -99,7 +105,21 @@ public class SingleArm extends LinearOpMode {
             leftBackDrive.setPower(leftBackPower);
             rightBackDrive.setPower(rightBackPower);
 
+            if (gamepad1.dpad_up) {
+                clawPower = 1.0;
+            } else if (gamepad1.dpad_down) {
+                clawPower = 0.0;
+            } else {
+                clawPower = 0.5;
+            }
+
+
+            // claw.setDirection(Servo.Direction.FORWARD);
+            claw.setPosition(clawPower);
+
             // Show the elapsed game time and wheel power.
+            telemetry.addData("Claw Input", clawPower);
+            telemetry.addData("Claw", claw.getPosition());
             telemetry.addData("Status", "Run Time: " + runtime.toString());
             telemetry.addData("Front left/Right", "%4.2f, %4.2f", leftFrontPower, rightFrontPower);
             telemetry.addData("Back  left/Right", "%4.2f, %4.2f", leftBackPower, rightBackPower);
