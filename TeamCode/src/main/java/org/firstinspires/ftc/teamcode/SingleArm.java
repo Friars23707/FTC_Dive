@@ -17,12 +17,17 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 @TeleOp(name="SingleArm", group="TeleOps")
 public class SingleArm extends LinearOpMode {
 
+    int armPos = 0;
+
     // Declare OpMode members for each of the 4 motors.
     private ElapsedTime runtime = new ElapsedTime();
     private DcMotor leftFrontDrive = null;
     private DcMotor leftBackDrive = null;
     private DcMotor rightFrontDrive = null;
     private DcMotor rightBackDrive = null;
+    private DcMotor leftArm = null;
+    private DcMotor rightArm = null;
+    private DcMotor slide = null;
     private Servo claw = null;
     private Servo wrist = null;
 
@@ -35,6 +40,11 @@ public class SingleArm extends LinearOpMode {
         leftBackDrive  = hardwareMap.get(DcMotor.class, "back_left");
         rightFrontDrive = hardwareMap.get(DcMotor.class, "front_right");
         rightBackDrive = hardwareMap.get(DcMotor.class, "back_right");
+
+        leftArm = hardwareMap.get(DcMotor.class,"arm_left");
+        rightArm = hardwareMap.get(DcMotor.class,"arm_right");
+        slide = hardwareMap.get(DcMotor.class,"slide");
+
         claw = hardwareMap.get(Servo.class, "claw");
         wrist = hardwareMap.get(Servo.class, "wrist");
 
@@ -44,10 +54,22 @@ public class SingleArm extends LinearOpMode {
         rightFrontDrive.setDirection(DcMotor.Direction.FORWARD);
         rightBackDrive.setDirection(DcMotor.Direction.FORWARD);
 
+        // Brake when not moving
         leftFrontDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         leftBackDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         rightFrontDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         rightBackDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+
+        leftArm.setDirection(DcMotor.Direction.FORWARD);
+        rightArm.setDirection(DcMotor.Direction.REVERSE);
+        leftArm.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        rightArm.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        leftArm.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        rightArm.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+
+        slide.setDirection(DcMotor.Direction.FORWARD);
+        slide.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        slide.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
         // Wait for the game to start (driver presses PLAY)
         telemetry.addData("Status", "Initialized");
@@ -71,6 +93,9 @@ public class SingleArm extends LinearOpMode {
             double rightFrontPower = axial - lateral - yaw;
             double leftBackPower   = axial - lateral + yaw;
             double rightBackPower  = axial + lateral - yaw;
+
+            int armTarget = 0;
+            int slideTarget = 0;
 
             double clawPower = 0.5;
             double wristPower = wrist.getPosition();
@@ -115,6 +140,49 @@ public class SingleArm extends LinearOpMode {
             leftBackDrive.setPower(leftBackPower);
             rightBackDrive.setPower(rightBackPower);
 
+            // Erlis' (stolen) arm code [its logans]
+            if (gamepad2.dpad_down) { //INTAKE
+                setArmPow(0.5);
+                armTarget = 0;
+            } else if (gamepad2.dpad_left) { //SCORE-LOW
+                setArmPow(0.4);
+                armTarget = 2450;
+            } else if (gamepad2.dpad_up) { //SCORE-MID-LOW
+                setArmPow(0.4);
+                armTarget = 2800;
+            } else if (gamepad2.dpad_right) { //SCORE-LOW-LOW IS TOO LOW!
+                setArmPow(0.4);
+                armTarget = 3000;
+            } else {
+                armTarget = leftArm.getTargetPosition();
+            }
+            if (gamepad2.left_stick_y != 0) {
+                armTarget = leftArm.getCurrentPosition() - Math.round(gamepad2.left_stick_y*50);
+            }
+
+
+            if (gamepad2.right_bumper) {
+                leftArm.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+                rightArm.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+            }
+
+            leftArm.setTargetPosition(armTarget);
+            leftArm.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            rightArm.setTargetPosition(armTarget);
+            rightArm.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+
+            // Wrist Code
+            slide.setPower(0.5);
+
+            if (gamepad2.right_stick_y != 0) {
+                slideTarget = slide.getCurrentPosition() + Math.round(gamepad2.right_stick_y*50);
+            } else {
+                slideTarget = slide.getTargetPosition();
+            }
+
+            slide.setTargetPosition(slideTarget);
+            slide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+
             if (gamepad2.dpad_up) {
                 clawPower = 1.0;
             } else if (gamepad2.dpad_down) {
@@ -138,9 +206,17 @@ public class SingleArm extends LinearOpMode {
             telemetry.addData("Wrist", wrist.getPosition());
             telemetry.addData("Claw Input", clawPower);
             telemetry.addData("Claw", claw.getPosition());
+            telemetry.addData("Slide", slideTarget+" : "+slide.getCurrentPosition());
             telemetry.addData("Status", "Run Time: " + runtime.toString());
             telemetry.addData("Front left/Right", "%4.2f, %4.2f", leftFrontPower, rightFrontPower);
             telemetry.addData("Back  left/Right", "%4.2f, %4.2f", leftBackPower, rightBackPower);
             telemetry.update();
         }
-    }}
+
+    }
+    public void setArmPow(double pow) {
+        //Set the power for all encoders ((LEFT AND RIGHT ARM MUST MATCH OR KABOOM))
+        leftArm.setPower(pow);
+        rightArm.setPower(pow);
+    }
+}
