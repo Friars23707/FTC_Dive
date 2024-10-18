@@ -20,16 +20,16 @@ public class SingleArm extends LinearOpMode {
     int armPos = 0;
 
     // Declare OpMode members for each of the 4 motors.
-    private ElapsedTime runtime = new ElapsedTime();
-    private DcMotor leftFrontDrive = null;
-    private DcMotor leftBackDrive = null;
-    private DcMotor rightFrontDrive = null;
-    private DcMotor rightBackDrive = null;
-    private DcMotor leftArm = null;
-    private DcMotor rightArm = null;
-    private DcMotor slide = null;
-    private Servo claw = null;
-    private Servo wrist = null;
+    public ElapsedTime runtime = new ElapsedTime();
+    public DcMotor leftFrontDrive = null;
+    public DcMotor leftBackDrive = null;
+    public DcMotor rightFrontDrive = null;
+    public DcMotor rightBackDrive = null;
+    public DcMotor leftArm = null;
+    public DcMotor rightArm = null;
+    public DcMotor slide = null;
+    public Servo claw = null;
+    public Servo wrist = null;
 
     @Override
     public void runOpMode() throws InterruptedException {
