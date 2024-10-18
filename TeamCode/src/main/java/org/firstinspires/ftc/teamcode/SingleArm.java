@@ -171,7 +171,7 @@ public class SingleArm extends LinearOpMode {
             rightArm.setTargetPosition(armTarget);
             rightArm.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 
-            // Wrist Code
+            // Slide Code
             slide.setPower(0.5);
 
             if (gamepad2.right_stick_y != 0) {
@@ -183,17 +183,17 @@ public class SingleArm extends LinearOpMode {
             slide.setTargetPosition(slideTarget);
             slide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 
-            if (gamepad2.dpad_up) {
+            if (gamepad2.y) {
                 clawPower = 1.0;
-            } else if (gamepad2.dpad_down) {
+            } else if (gamepad2.a) {
                 clawPower = 0.0;
             } else {
                 clawPower = 0.5;
             }
 
-            if (gamepad2.dpad_left) {
+            if (gamepad2.x) {
                 wristPower = (WRIST_FOLDED_IN);
-            } else if (gamepad2.dpad_right) {
+            } else if (gamepad2.b) {
                 wristPower = (WRIST_FOLDED_OUT);
             }
 
