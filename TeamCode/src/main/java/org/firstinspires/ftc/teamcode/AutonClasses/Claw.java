@@ -20,7 +20,7 @@ public class Claw extends LinearOpMode {
     public Claw(HardwareMap sent_hwM) {
         hwM = sent_hwM;
 
-        claw = hwM.get(Servo .class, "claw");
+        claw = hwM.get(Servo.class, "claw");
         wrist = hwM.get(Servo.class, "wrist");
     }
 

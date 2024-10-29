@@ -9,6 +9,7 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 import org.firstinspires.ftc.teamcode.AutonClasses.Claw;
+import org.firstinspires.ftc.teamcode.AutonClasses.Slide;
 
 // RR-specific imports
 
@@ -22,6 +23,7 @@ public class Left_1 extends LinearOpMode {
         Pose2d initialPose = new Pose2d(11.8, 61.7, Math.toRadians(90));
         MecanumDrive drive = new MecanumDrive(hardwareMap, initialPose);
         Claw claw = new Claw(hardwareMap);
+        Slide slide = new Slide(hardwareMap);
 
         //Create the trajs
         Action goToBucket = drive.actionBuilder(initialPose)
@@ -45,6 +47,9 @@ public class Left_1 extends LinearOpMode {
                 .build();
 
 
+        // actions that need to happen on init; for instance, a claw tightening.
+        Actions.runBlocking(claw.collect());
+
         //Custom Wait
         while (!isStopRequested() && !opModeIsActive()) {
             telemetry.addData("Waiting:", "0");
@@ -60,8 +65,10 @@ public class Left_1 extends LinearOpMode {
         //Run all of the actions
         Actions.runBlocking(
                 new SequentialAction(
+                        slide.extend(false),
                         goToBucket,
                         claw.eject(),
+                        slide.retract(false),
                         floorSampleOne,
                         claw.collect(),
                         goToBucket,
