@@ -1,0 +1,88 @@
+package org.firstinspires.ftc.teamcode;
+
+import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.DcMotor;
+
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
+import org.firstinspires.ftc.robotcore.external.navigation.Pose2D;
+
+@TeleOp(name="Custom Odometry", group="Linear OpMode")
+public class CustomOdometry extends LinearOpMode {
+    GoBildaPinpointDriver odo;
+
+    public void initalize() {
+        odo = hardwareMap.get(GoBildaPinpointDriver.class, "odo");
+        odo.setEncoderResolution(GoBildaPinpointDriver.GoBildaOdometryPods.goBILDA_4_BAR_POD);
+        odo.setEncoderDirections(GoBildaPinpointDriver.EncoderDirection.FORWARD, GoBildaPinpointDriver.EncoderDirection.FORWARD);
+        odo.resetPosAndIMU();
+
+        resetRuntime();
+    }
+
+    private DcMotor leftFrontDrive = null;
+    private DcMotor leftBackDrive = null;
+    private DcMotor rightFrontDrive = null;
+    private DcMotor rightBackDrive = null;
+
+    public void moveTo(double x, double y) {
+        Pose2D position;
+        do {
+            position = odo.getPosition();
+            double currentX = position.getX(DistanceUnit.INCH);
+            double currentY = position.getY(DistanceUnit.INCH);
+
+            double axial = x - currentX;
+            double lateral = y - currentY;
+
+            double leftFrontPower = axial + lateral;
+            double rightFrontPower = axial - lateral;
+            double leftBackPower = axial - lateral;
+            double rightBackPower = axial + lateral;
+
+            double max;
+            max = Math.max(Math.abs(leftFrontPower), Math.abs(rightFrontPower));
+            max = Math.max(max, Math.abs(leftBackPower));
+            max = Math.max(max, Math.abs(rightBackPower));
+
+            if (max > 1.0) {
+                leftFrontPower /= max;
+                rightFrontPower /= max;
+                leftBackPower /= max;
+                rightBackPower /= max;
+            }
+
+            leftFrontDrive.setPower(leftFrontPower);
+            rightFrontDrive.setPower(rightFrontPower);
+            leftBackDrive.setPower(leftBackPower);
+            rightBackDrive.setPower(rightBackPower);
+
+        } while ((Math.abs(x - position.getX(DistanceUnit.INCH)) > 0.1 || Math.abs(y - position.getY(DistanceUnit.INCH)) > 0.1) && !isStopRequested()); // Assuming a threshold for reaching target
+    }
+
+    public void turn(double angle) {
+        Pose2D position = odo.getPosition();
+        double currentAngle = position.getHeading(AngleUnit.RADIANS); // Assuming the heading is in radians
+        double targetAngle = currentAngle + angle;
+
+        while ((Math.abs(targetAngle - odo.getPosition().getHeading(AngleUnit.RADIANS)) > 0.1) && !isStopRequested()) { // Assuming a threshold for angle precision
+            double power = angle > 0 ? 0.5 : -0.5; // Adjust power as needed
+
+            leftFrontDrive.setPower(-power);
+            rightFrontDrive.setPower(power);
+            leftBackDrive.setPower(-power);
+            rightBackDrive.setPower(power);
+        }
+
+        leftFrontDrive.setPower(0);
+        rightFrontDrive.setPower(0);
+        leftBackDrive.setPower(0);
+        rightBackDrive.setPower(0);
+    }
+
+    @Override
+    public void runOpMode() throws InterruptedException {}
+}
+
+
