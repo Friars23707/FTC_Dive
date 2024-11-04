@@ -10,7 +10,6 @@ import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.Pose2D;
 
-@TeleOp(name="Custom Odometry", group="Linear OpMode")
 public class CustomOdometry extends LinearOpMode {
     GoBildaPinpointDriver odo;
     private DcMotor leftFrontDrive = null;
