@@ -79,10 +79,10 @@ public class CustomOdometry extends LinearOpMode {
 
     public void turn(double angle) {
         Pose2D position = odo.getPosition();
-        double currentAngle = position.getHeading(AngleUnit.RADIANS); // Assuming the heading is in radians
+        double currentAngle = position.getHeading(AngleUnit.DEGREES); // Assuming the heading is in radians
         double targetAngle = currentAngle + angle;
 
-        while ((Math.abs(targetAngle - odo.getPosition().getHeading(AngleUnit.RADIANS)) > 0.1) && !isStopRequested()) { // Assuming a threshold for angle precision
+        while ((Math.abs(targetAngle - odo.getPosition().getHeading(AngleUnit.DEGREES)) > 0.1) && !isStopRequested()) { // Assuming a threshold for angle precision
             double power = angle > 0 ? 0.5 : -0.5; // Adjust power as needed
 
             leftFrontDrive.setPower(-power);
