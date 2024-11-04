@@ -9,7 +9,7 @@ public class Main extends OpMode {
     @Override
     public void init() {
         customOdometry = new CustomOdometry();
-        customOdometry.initalize();
+        customOdometry.initalize(hardwareMap);
     }
 
     public void loop() {
