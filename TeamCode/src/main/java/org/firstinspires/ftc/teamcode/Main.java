@@ -13,8 +13,8 @@ public class Main extends OpMode {
     }
 
     public void loop() {
-        customOdometry.moveTo(30, 40);
-        customOdometry.turn(Math.PI);
+        customOdometry.moveTo(5, 5);
+        customOdometry.turn(45);
     }
 }
 
