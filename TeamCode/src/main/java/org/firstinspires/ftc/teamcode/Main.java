@@ -1,20 +1,31 @@
 package org.firstinspires.ftc.teamcode;
 
+import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import org.firstinspires.ftc.teamcode.CustomOdometry;
 
-public class Main extends OpMode {
+@Autonomous
+public class Main extends LinearOpMode {
     CustomOdometry customOdometry;
 
     @Override
-    public void init() {
+    public void runOpMode() throws InterruptedException {
+
         customOdometry = new CustomOdometry();
         customOdometry.initalize(hardwareMap);
-    }
+        telemetry.addData("Started", "true");
+        telemetry.update();
 
-    public void loop() {
+        waitForStart();
+
+        telemetry.addData("Running", "true");
+        telemetry.update();
         customOdometry.moveTo(5, 5);
         customOdometry.turn(45);
+        telemetry.addData("Ended", "true");
+        telemetry.update();
     }
+
 }
 

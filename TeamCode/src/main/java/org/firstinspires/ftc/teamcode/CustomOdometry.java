@@ -3,7 +3,6 @@ package org.firstinspires.ftc.teamcode;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
@@ -23,10 +22,10 @@ public class CustomOdometry extends LinearOpMode {
         odo.setEncoderDirections(GoBildaPinpointDriver.EncoderDirection.FORWARD, GoBildaPinpointDriver.EncoderDirection.FORWARD);
         odo.resetPosAndIMU();
 
-        leftFrontDrive = hardwareMap.get(DcMotorEx.class, "front_left");
-        leftBackDrive = hardwareMap.get(DcMotorEx.class, "back_left");
-        rightBackDrive = hardwareMap.get(DcMotorEx.class, "back_right");
-        rightFrontDrive = hardwareMap.get(DcMotorEx.class, "front_right");
+        leftFrontDrive = hwm.get(DcMotor.class, "front_left");
+        leftBackDrive = hwm.get(DcMotor.class, "back_left");
+        rightBackDrive = hwm.get(DcMotor.class, "back_right");
+        rightFrontDrive = hwm.get(DcMotor.class, "front_right");
 
         leftFrontDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         leftBackDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
