@@ -5,6 +5,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
+import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.Pose2D;
@@ -16,7 +17,10 @@ public class CustomOdometry extends LinearOpMode {
     private DcMotor rightFrontDrive = null;
     private DcMotor rightBackDrive = null;
 
-    public void initalize(HardwareMap hwm) {
+    public Telemetry telem;
+
+    public void initalize(HardwareMap hwm, Telemetry tm) {
+        telem = tm;
         odo = hwm.get(GoBildaPinpointDriver.class, "odo");
         odo.setEncoderResolution(GoBildaPinpointDriver.GoBildaOdometryPods.goBILDA_4_BAR_POD);
         odo.setEncoderDirections(GoBildaPinpointDriver.EncoderDirection.FORWARD, GoBildaPinpointDriver.EncoderDirection.FORWARD);
@@ -48,6 +52,10 @@ public class CustomOdometry extends LinearOpMode {
             double currentX = position.getX(DistanceUnit.INCH);
             double currentY = position.getY(DistanceUnit.INCH);
 
+            telem.addData("Target: ", "{X: %.3f, Y: %.3f}", x, y);
+            telem.addData("Current: ", "{X: %.3f, Y: %.3f}", currentX, currentY);
+            telem.update();
+
             double axial = x - currentX;
             double lateral = y - currentY;
 
@@ -73,21 +81,32 @@ public class CustomOdometry extends LinearOpMode {
             leftBackDrive.setPower(leftBackPower);
             rightBackDrive.setPower(rightBackPower);
 
+            odo.update();
         } while ((Math.abs(x - position.getX(DistanceUnit.INCH)) > 0.1 || Math.abs(y - position.getY(DistanceUnit.INCH)) > 0.1) && !isStopRequested()); // Assuming a threshold for reaching target
     }
 
     public void turn(double angle) {
         Pose2D position = odo.getPosition();
-        double currentAngle = position.getHeading(AngleUnit.DEGREES); // Assuming the heading is in radians
+        double currentAngle = position.getHeading(AngleUnit.DEGREES);
         double targetAngle = currentAngle + angle;
 
-        while ((Math.abs(targetAngle - odo.getPosition().getHeading(AngleUnit.DEGREES)) > 0.1) && !isStopRequested()) { // Assuming a threshold for angle precision
-            double power = angle > 0 ? 0.5 : -0.5; // Adjust power as needed
+        while ((Math.abs(targetAngle - odo.getPosition().getHeading(AngleUnit.DEGREES)) > 0.1) && !isStopRequested()) {
+            telem.addData("Target: ", targetAngle);
+            telem.addData("Current: ", odo.getPosition().getHeading(AngleUnit.DEGREES));
+            telem.update();
+
+            double error = targetAngle - odo.getPosition().getHeading(AngleUnit.DEGREES);
+            double power = 0.3 * (error / Math.abs(angle)); // Adjust the constant (0.5) to fine-tune the power scaling
+
+            if (power > 0.4) power = 0.4; // Cap the maximum power
+            if (power < -0.4) power = -0.4; // Cap the minimum power
 
             leftFrontDrive.setPower(-power);
             rightFrontDrive.setPower(power);
             leftBackDrive.setPower(-power);
             rightBackDrive.setPower(power);
+
+            odo.update();
         }
 
         leftFrontDrive.setPower(0);
@@ -95,6 +114,7 @@ public class CustomOdometry extends LinearOpMode {
         leftBackDrive.setPower(0);
         rightBackDrive.setPower(0);
     }
+
 
     @Override
     public void runOpMode() throws InterruptedException {}

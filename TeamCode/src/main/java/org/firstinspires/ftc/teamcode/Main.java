@@ -13,7 +13,7 @@ public class Main extends LinearOpMode {
     public void runOpMode() throws InterruptedException {
 
         customOdometry = new CustomOdometry();
-        customOdometry.initalize(hardwareMap);
+        customOdometry.initalize(hardwareMap, telemetry);
         telemetry.addData("Started", "true");
         telemetry.update();
 
