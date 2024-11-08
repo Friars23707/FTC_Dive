@@ -78,6 +78,12 @@ public class SingleArm extends LinearOpMode {
         waitForStart();
         runtime.reset();
 
+        int armTarget = 0;
+        int slideTarget = 0;
+
+        double clawPower = 0.5;
+        double wristPower = wrist.getPosition();
+
         // run until the end of the match (driver presses STOP)
         while (opModeIsActive()) {
             double max;
@@ -93,12 +99,6 @@ public class SingleArm extends LinearOpMode {
             double rightFrontPower = axial - lateral - yaw;
             double leftBackPower   = axial - lateral + yaw;
             double rightBackPower  = axial + lateral - yaw;
-
-            int armTarget = 0;
-            int slideTarget = 0;
-
-            double clawPower = 0.5;
-            double wristPower = wrist.getPosition();
 
             final double WRIST_FOLDED_IN   = 0.8333;
             final double WRIST_FOLDED_OUT  = 0.5;
@@ -141,21 +141,22 @@ public class SingleArm extends LinearOpMode {
             rightBackDrive.setPower(rightBackPower);
 
             // Erlis' (stolen) arm code [its logans]
-            if (gamepad2.dpad_down) { //INTAKE
+            if (gamepad2.dpad_down) { //FLOOR INTAKE
                 setArmPow(0.5);
                 armTarget = 0;
-            } else if (gamepad2.dpad_left) { //SCORE-LOW
+            } else if (gamepad2.dpad_left) { //SUB INTAKE
+                setArmPow(0.5);
+                armTarget = 150;
+            } else if (gamepad2.dpad_up) { //LOW BASKET
                 setArmPow(0.4);
-                armTarget = 2450;
-            } else if (gamepad2.dpad_up) { //SCORE-MID-LOW
+                armTarget = 1000;
+            } else if (gamepad2.dpad_right) { //HIGH BASKET
                 setArmPow(0.4);
-                armTarget = 2800;
-            } else if (gamepad2.dpad_right) { //SCORE-LOW-LOW IS TOO LOW!
-                setArmPow(0.4);
-                armTarget = 3000;
+                armTarget = 1500;
             } else {
                 armTarget = leftArm.getTargetPosition();
             }
+
             if (gamepad2.left_stick_y != 0) {
                 armTarget = leftArm.getCurrentPosition() - Math.round(gamepad2.left_stick_y*50);
             }

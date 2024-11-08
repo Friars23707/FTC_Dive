@@ -90,7 +90,7 @@ public class CustomOdometry extends LinearOpMode {
         double currentAngle = position.getHeading(AngleUnit.DEGREES);
         double targetAngle = currentAngle + angle;
 
-        while ((Math.abs(targetAngle - odo.getPosition().getHeading(AngleUnit.DEGREES)) > 0.1) && !isStopRequested()) {
+        while (((currentAngle < targetAngle) || (currentAngle < 180-targetAngle)) && !isStopRequested()) {
             telem.addData("Target: ", targetAngle);
             telem.addData("Current: ", odo.getPosition().getHeading(AngleUnit.DEGREES));
             telem.update();
