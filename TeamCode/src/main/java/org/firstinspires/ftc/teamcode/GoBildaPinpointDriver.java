@@ -497,7 +497,7 @@ public class GoBildaPinpointDriver extends I2cDeviceSynchDevice<I2cDeviceSynchSi
         return new Pose2D(DistanceUnit.MM,
                 xPosition,
                 yPosition,
-                AngleUnit.RADIANS,
+                AngleUnit.DEGREES,
                 hOrientation);
     }
 
