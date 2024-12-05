@@ -82,7 +82,7 @@ public class SingleArm extends LinearOpMode {
         int slideTarget = 0;
 
         double clawPower = 0.5;
-        double wristPower = wrist.getPosition();
+        double wristPos = wrist.getPosition();
 
         // run until the end of the match (driver presses STOP)
         while (opModeIsActive()) {
@@ -158,7 +158,7 @@ public class SingleArm extends LinearOpMode {
             }
 
             if (gamepad2.left_stick_y != 0) {
-                armTarget = leftArm.getCurrentPosition() - Math.round(gamepad2.left_stick_y*50);
+                armTarget = leftArm.getCurrentPosition() + Math.round(gamepad2.left_stick_y*50);
             }
 
 
@@ -193,15 +193,15 @@ public class SingleArm extends LinearOpMode {
             }
 
             if (gamepad2.x) {
-                wristPower = (WRIST_FOLDED_IN);
+                wristPos = (WRIST_FOLDED_IN);
             } else if (gamepad2.b) {
-                wristPower = (WRIST_FOLDED_OUT);
+                wristPos = (WRIST_FOLDED_OUT);
             }
 
             // wristPower = gamepad2.dpad_left ? 1 : 0;
             // claw.setDirection(Servo.Direction.FORWARD);
             claw.setPosition(clawPower);
-            wrist.setPosition(wristPower);
+            wrist.setPosition(wristPos);
 
             // Show the elapsed game time and wheel power.
             telemetry.addData("Wrist", wrist.getPosition());
