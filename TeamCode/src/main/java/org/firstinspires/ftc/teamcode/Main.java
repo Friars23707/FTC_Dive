@@ -22,7 +22,7 @@ public class Main extends LinearOpMode {
         telemetry.addData("Running", "true");
         telemetry.update();
         //customOdometry.moveTo(5, 5);
-        customOdometry.turn(20);
+        customOdometry.turn(180);
         telemetry.addData("Ended", "true");
         telemetry.update();
     }
