@@ -86,8 +86,9 @@ public class CustomOdometry extends LinearOpMode {
     }
 
     public void turn(double angle) {
+        angle *= 0.0206;
         Pose2D position = odo.getPosition();
-        double currentAngle = position.getHeading(AngleUnit.DEGREES);
+        double currentAngle = odo.getPosition().getHeading(AngleUnit.DEGREES);
         double targetAngle = currentAngle + angle;
 
         while (((currentAngle < targetAngle) || (currentAngle < 180-targetAngle)) && !isStopRequested()) {
@@ -96,9 +97,16 @@ public class CustomOdometry extends LinearOpMode {
             telem.addData("Frequency: ", odo.getFrequency());
             telem.update();
 
-            double error = targetAngle - odo.getPosition().getHeading(AngleUnit.DEGREES);
-            double power = 0.3 * (error / Math.abs(angle)); // Adjust the constant (0.5) to fine-tune the power scaling
 
+            double error = targetAngle - odo.getPosition().getHeading(AngleUnit.DEGREES);
+            //double power = 0.75 * (error / Math.abs(angle)); // Adjust the constant (0.5) to fine-tune the power scaling
+
+
+            double power = 0.4;
+
+            if (error <  0.5) {
+                power = 0.2;
+            }
             if (power > 0.4) power = 0.4; // Cap the maximum power
             if (power < -0.4) power = -0.4; // Cap the minimum power
 
