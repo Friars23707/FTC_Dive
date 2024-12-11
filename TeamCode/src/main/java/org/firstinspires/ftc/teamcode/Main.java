@@ -20,16 +20,15 @@ public class Main extends LinearOpMode {
         telemetry.update();
 
         waitForStart();
-        while (true) {
-            //telemetry.addData("Running", "true");
-            //telemetry.update();
-            //customOdometry.moveTo(5, 5);
-            //customOdometry.turn(180);
-            //telemetry.addData("Ended", "true");
-            telemetry.addData("Heading: ", customOdometry.odo.getHeading(AngleUnit.DEGREES));
-            telemetry.update();
-
+        while (!isStopRequested()) {
+            customOdometry.moveTo(5, 5);
+            sleep(600);
+            customOdometry.moveTo(0, 0);
+            sleep(600);
+            customOdometry.moveTo(-5, -5);
+            sleep(600);
         }
+
     }
 }
 

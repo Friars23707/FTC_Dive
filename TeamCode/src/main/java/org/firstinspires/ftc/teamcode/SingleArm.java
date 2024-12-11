@@ -178,7 +178,7 @@ public class SingleArm extends LinearOpMode {
             if (gamepad2.right_stick_y != 0) {
                 slideTarget = slide.getCurrentPosition() + Math.round(gamepad2.right_stick_y*50);
             } else {
-                slideTarget = slide.getTargetPosition();
+                slideTarget = slide.getCurrentPosition();
             }
 
             slide.setTargetPosition(slideTarget);

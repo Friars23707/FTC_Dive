@@ -11,6 +11,8 @@ import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.Pose2D;
 
 public class CustomOdometry extends LinearOpMode {
+
+    double ROBOT_SPEED = 0.2;
     GoBildaPinpointDriver odo;
     private DcMotor leftFrontDrive = null;
     private DcMotor leftBackDrive = null;
@@ -45,45 +47,6 @@ public class CustomOdometry extends LinearOpMode {
     }
 
 
-    public void moveTo(double x, double y) {
-        Pose2D position;
-        do {
-            position = odo.getPosition();
-            double currentX = position.getX(DistanceUnit.INCH);
-            double currentY = position.getY(DistanceUnit.INCH);
-
-            telem.addData("Target: ", "{X: %.3f, Y: %.3f}", x, y);
-            telem.addData("Current: ", "{X: %.3f, Y: %.3f}", currentX, currentY);
-            telem.update();
-
-            double axial = x - currentX;
-            double lateral = y - currentY;
-
-            double leftFrontPower = axial + lateral;
-            double rightFrontPower = axial - lateral;
-            double leftBackPower = axial - lateral;
-            double rightBackPower = axial + lateral;
-
-            double max;
-            max = Math.max(Math.abs(leftFrontPower), Math.abs(rightFrontPower));
-            max = Math.max(max, Math.abs(leftBackPower));
-            max = Math.max(max, Math.abs(rightBackPower));
-
-            if (max > 1.0) {
-                leftFrontPower /= max;
-                rightFrontPower /= max;
-                leftBackPower /= max;
-                rightBackPower /= max;
-            }
-
-            leftFrontDrive.setPower(leftFrontPower);
-            rightFrontDrive.setPower(rightFrontPower);
-            leftBackDrive.setPower(leftBackPower);
-            rightBackDrive.setPower(rightBackPower);
-
-            odo.update();
-        } while ((Math.abs(x - position.getX(DistanceUnit.INCH)) > 0.1 || Math.abs(y - position.getY(DistanceUnit.INCH)) > 0.1) && !isStopRequested()); // Assuming a threshold for reaching target
-    }
 
     public void turn(double angle) {
         angle *= 0.0206;
@@ -122,6 +85,55 @@ public class CustomOdometry extends LinearOpMode {
         rightFrontDrive.setPower(0);
         leftBackDrive.setPower(0);
         rightBackDrive.setPower(0);
+    }
+
+    public void moveTo(double x, double y) {
+        odo.update();
+        Pose2D position = odo.getPosition();
+        double currentX = position.getX(DistanceUnit.INCH);
+        double currentY = position.getY(DistanceUnit.INCH);
+
+        telem.addData("cancel", "true");
+        telem.addData("Target: ", "{X: %.3f, Y: %.3f}", x, y);
+        telem.addData("Current: ", "{X: %.3f, Y: %.3f}", currentX, currentY);
+        telem.update();
+
+        while (!isStopRequested()) {
+            telem.addData("Target: ", "{X: %.3f, Y: %.3f}", x, y);
+            telem.addData("Current: ", "{X: %.3f, Y: %.3f}", currentX, currentY);
+            telem.addData("In loop", "true");
+            telem.update();
+
+            currentX = position.getX(DistanceUnit.INCH);
+            currentY = position.getY(DistanceUnit.INCH);
+
+            double axial = x > currentX ? ROBOT_SPEED : -ROBOT_SPEED;
+            double lateral = y > currentY ? -ROBOT_SPEED : ROBOT_SPEED;
+            double yaw = 0;
+
+            double leftFrontPower  = axial + lateral + yaw;
+            double rightFrontPower = axial - lateral - yaw;
+            double leftBackPower   = axial - lateral + yaw;
+            double rightBackPower  = axial + lateral - yaw;
+
+            leftFrontDrive.setPower(leftFrontPower);
+            rightFrontDrive.setPower(rightFrontPower);
+            leftBackDrive.setPower(leftBackPower);
+            rightBackDrive.setPower(rightBackPower);
+
+            odo.update();
+            position = odo.getPosition();
+            boolean run1 = Math.abs(position.getX(DistanceUnit.INCH) - x) > 1;
+            boolean run2 = Math.abs(position.getY(DistanceUnit.INCH) - y) > 1;
+            if (!run1 && !run2) {
+                leftFrontDrive.setPower(0);
+                rightFrontDrive.setPower(0);
+                leftBackDrive.setPower(0);
+                rightBackDrive.setPower(0);
+                return;
+            }
+        }
+
     }
 
 
