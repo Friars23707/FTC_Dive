@@ -12,8 +12,8 @@ public class LeftAuton2 extends LinearOpMode {
     Claw claw;
     Slide slide;
 
-    final private int[] bucketLocation = {3, 30};
-    final private int sampleY = 10;
+    final private int[] bucketLocation = {45, -3};
+    final private int sampleY = -36;
 
     @Override
     public void runOpMode() throws InterruptedException {
@@ -28,24 +28,21 @@ public class LeftAuton2 extends LinearOpMode {
 
         waitForStart();
 
-        customOdometry.moveTo(0, sampleY);
-        customOdometry.moveTo(5, sampleY);
+        customOdometry.moveTo(26, sampleY);
         claw.collect();
         customOdometry.moveTo(bucketLocation[0], bucketLocation[1]);
         slide.extend(true);
         claw.eject();
         slide.retract(false);
 
-        customOdometry.moveTo(5, sampleY);
-        customOdometry.moveTo(10, sampleY);
+        customOdometry.moveTo(37, sampleY);
         claw.collect();
         customOdometry.moveTo(bucketLocation[0], bucketLocation[1]);
         slide.extend(true);
         claw.eject();
         slide.retract(false);
 
-        customOdometry.moveTo(10, sampleY);
-        customOdometry.moveTo(15, sampleY);
+        customOdometry.moveTo(48, sampleY);
         claw.collect();
         customOdometry.moveTo(bucketLocation[0], bucketLocation[1]);
         slide.extend(true);

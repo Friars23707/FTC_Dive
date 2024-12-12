@@ -12,7 +12,9 @@ import org.firstinspires.ftc.robotcore.external.navigation.Pose2D;
 
 public class CustomOdometry extends LinearOpMode {
 
-    double ROBOT_SPEED = 0.2;
+    final double ROBOT_SPEED = 0.3;
+
+    double previousHeading = 0.0;
     GoBildaPinpointDriver odo;
     private DcMotor leftFrontDrive = null;
     private DcMotor leftBackDrive = null;
@@ -89,6 +91,7 @@ public class CustomOdometry extends LinearOpMode {
                 rightFrontDrive.setPower(0);
                 leftBackDrive.setPower(0);
                 rightBackDrive.setPower(0);
+                turnTo(previousHeading);
                 return;
             }
         }
@@ -99,6 +102,8 @@ public class CustomOdometry extends LinearOpMode {
         odo.update();
         Pose2D position = odo.getPosition();
         double currentHeading = position.getHeading(AngleUnit.DEGREES);
+
+        previousHeading = heading;
 
         telem.addData("cancel", "true");
         telem.addData("Target: ", "{Heading: %.3f}", heading);
@@ -111,11 +116,11 @@ public class CustomOdometry extends LinearOpMode {
             telem.addData("In loop", "true");
             telem.update();
 
-            currentHeading = position.getHeading(AngleUnit.DEGREES);
+            currentHeading = radToDeg(position.getHeading(AngleUnit.DEGREES));
 
             double axial = 0;
             double lateral = 0;
-            double yaw = heading > currentHeading ? ROBOT_SPEED : -ROBOT_SPEED;
+            double yaw = heading <= currentHeading ? ROBOT_SPEED : -ROBOT_SPEED;
 
             double leftFrontPower  = axial + lateral + yaw;
             double rightFrontPower = axial - lateral - yaw;
@@ -129,7 +134,7 @@ public class CustomOdometry extends LinearOpMode {
 
             odo.update();
             position = odo.getPosition();
-            boolean run3 = Math.abs(position.getHeading(AngleUnit.DEGREES) - heading) > 10;
+            boolean run3 = Math.abs(radToDeg(position.getHeading(AngleUnit.DEGREES)) - heading) > 5;
             if (!run3) {
                 leftFrontDrive.setPower(0);
                 rightFrontDrive.setPower(0);
@@ -139,6 +144,62 @@ public class CustomOdometry extends LinearOpMode {
             }
         }
 
+    }
+
+    public void moveToWithHeading(double x, double y, double heading) {
+        odo.update();
+        Pose2D position = odo.getPosition();
+        double currentX = position.getX(DistanceUnit.INCH);
+        double currentY = position.getY(DistanceUnit.INCH);
+        double currentHeading = radToDeg(position.getHeading(AngleUnit.DEGREES));
+
+        telem.addData("cancel", "true");
+        telem.addData("Target: ", "{X: %.3f, Y: %.3f, Heading: %.3f}", x, y, heading);
+        telem.addData("Current: ", "{X: %.3f, Y: %.3f, Heading: %.3f}", currentX, currentY, currentHeading);
+        telem.update();
+
+        while (!isStopRequested()) {
+            telem.addData("Target: ", "{X: %.3f, Y: %.3f, Heading: %.3f}", x, y, heading);
+            telem.addData("Current: ", "{X: %.3f, Y: %.3f, Heading: %.3f}", currentX, currentY, currentHeading);
+            telem.addData("In loop", "true");
+            telem.update();
+
+            currentX = position.getX(DistanceUnit.INCH);
+            currentY = position.getY(DistanceUnit.INCH);
+            currentHeading = radToDeg(position.getHeading(AngleUnit.DEGREES));
+
+            double axial = x > currentX ? ROBOT_SPEED : -ROBOT_SPEED;
+            double lateral = y > currentY ? -ROBOT_SPEED : ROBOT_SPEED;
+            double yaw = heading <= currentHeading ? ROBOT_SPEED : -ROBOT_SPEED;;
+
+            double leftFrontPower  = axial + lateral + yaw;
+            double rightFrontPower = axial - lateral - yaw;
+            double leftBackPower   = axial - lateral + yaw;
+            double rightBackPower  = axial + lateral - yaw;
+
+            leftFrontDrive.setPower(leftFrontPower);
+            rightFrontDrive.setPower(rightFrontPower);
+            leftBackDrive.setPower(leftBackPower);
+            rightBackDrive.setPower(rightBackPower);
+
+            odo.update();
+            position = odo.getPosition();
+            boolean run1 = Math.abs(position.getX(DistanceUnit.INCH) - x) > 1;
+            boolean run2 = Math.abs(position.getY(DistanceUnit.INCH) - y) > 1;
+            boolean run3 = Math.abs(radToDeg(position.getHeading(AngleUnit.DEGREES)) - heading) > 5;
+            if (!run1 && !run2 && !run3) {
+                leftFrontDrive.setPower(0);
+                rightFrontDrive.setPower(0);
+                leftBackDrive.setPower(0);
+                rightBackDrive.setPower(0);
+                return;
+            }
+        }
+
+    }
+
+    public double radToDeg(double radians) {
+        return  radians * (180/Math.PI);
     }
 
     @Override

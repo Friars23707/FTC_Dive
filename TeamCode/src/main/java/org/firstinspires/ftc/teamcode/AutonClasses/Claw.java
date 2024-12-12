@@ -25,7 +25,7 @@ public class Claw extends LinearOpMode {
     }
 
     public void reset() {
-        wrist.setPosition(0.8333);
+        wrist.setPosition(0.5);
         sleep(500);
         claw.setPosition(0.5);
     }
@@ -34,7 +34,7 @@ public class Claw extends LinearOpMode {
 
         wrist.setPosition(0.5);
         sleep(500);
-        claw.setPosition(1.0);
+        claw.setPosition(0.0);
         sleep(2000);
         reset();
 

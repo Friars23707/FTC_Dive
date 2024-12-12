@@ -60,8 +60,8 @@ public class SingleArm extends LinearOpMode {
         rightFrontDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         rightBackDrive.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
-        leftArm.setDirection(DcMotor.Direction.FORWARD);
-        rightArm.setDirection(DcMotor.Direction.REVERSE);
+        leftArm.setDirection(DcMotor.Direction.REVERSE);
+        rightArm.setDirection(DcMotor.Direction.FORWARD);
         leftArm.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         rightArm.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         leftArm.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
@@ -158,7 +158,7 @@ public class SingleArm extends LinearOpMode {
             }
 
             if (gamepad2.left_stick_y != 0) {
-                armTarget = leftArm.getCurrentPosition() + Math.round(gamepad2.left_stick_y*50);
+                armTarget = leftArm.getCurrentPosition() - Math.round(gamepad2.left_stick_y*50);
             }
 
 
@@ -208,6 +208,7 @@ public class SingleArm extends LinearOpMode {
             telemetry.addData("Claw Input", clawPower);
             telemetry.addData("Claw", claw.getPosition());
             telemetry.addData("Slide", slideTarget+" : "+slide.getCurrentPosition());
+            telemetry.addData("Arm", armTarget+" : "+leftArm.getCurrentPosition());
             telemetry.addData("Status", "Run Time: " + runtime.toString());
             telemetry.addData("Front left/Right", "%4.2f, %4.2f", leftFrontPower, rightFrontPower);
             telemetry.addData("Back  left/Right", "%4.2f, %4.2f", leftBackPower, rightBackPower);
