@@ -46,47 +46,6 @@ public class CustomOdometry extends LinearOpMode {
         resetRuntime();
     }
 
-
-
-    public void turn(double angle) {
-        angle *= 0.0206;
-        Pose2D position = odo.getPosition();
-        double currentAngle = odo.getPosition().getHeading(AngleUnit.DEGREES);
-        double targetAngle = currentAngle + angle;
-
-        while (((currentAngle < targetAngle) || (currentAngle < 180-targetAngle)) && !isStopRequested()) {
-            telem.addData("Target: ", targetAngle);
-            telem.addData("Current: ", odo.getPosition().getHeading(AngleUnit.DEGREES));
-            telem.addData("Frequency: ", odo.getFrequency());
-            telem.update();
-
-
-            double error = targetAngle - odo.getPosition().getHeading(AngleUnit.DEGREES);
-            //double power = 0.75 * (error / Math.abs(angle)); // Adjust the constant (0.5) to fine-tune the power scaling
-
-
-            double power = 0.4;
-
-            if (error <  0.5) {
-                power = 0.2;
-            }
-            if (power > 0.4) power = 0.4; // Cap the maximum power
-            if (power < -0.4) power = -0.4; // Cap the minimum power
-
-            leftFrontDrive.setPower(-power);
-            rightFrontDrive.setPower(power);
-            leftBackDrive.setPower(-power);
-            rightBackDrive.setPower(power);
-
-            odo.update();
-        }
-
-        leftFrontDrive.setPower(0);
-        rightFrontDrive.setPower(0);
-        leftBackDrive.setPower(0);
-        rightBackDrive.setPower(0);
-    }
-
     public void moveTo(double x, double y) {
         odo.update();
         Pose2D position = odo.getPosition();
@@ -136,6 +95,51 @@ public class CustomOdometry extends LinearOpMode {
 
     }
 
+    public void turnTo(double heading) {
+        odo.update();
+        Pose2D position = odo.getPosition();
+        double currentHeading = position.getHeading(AngleUnit.DEGREES);
+
+        telem.addData("cancel", "true");
+        telem.addData("Target: ", "{Heading: %.3f}", heading);
+        telem.addData("Current: ", "{Heading: %.3f}", currentHeading);
+        telem.update();
+
+        while (!isStopRequested()) {
+            telem.addData("Target: ", "{Heading: %.3f}", heading);
+            telem.addData("Current: ", "{Heading: %.3f}", currentHeading);
+            telem.addData("In loop", "true");
+            telem.update();
+
+            currentHeading = position.getHeading(AngleUnit.DEGREES);
+
+            double axial = 0;
+            double lateral = 0;
+            double yaw = heading > currentHeading ? ROBOT_SPEED : -ROBOT_SPEED;
+
+            double leftFrontPower  = axial + lateral + yaw;
+            double rightFrontPower = axial - lateral - yaw;
+            double leftBackPower   = axial - lateral + yaw;
+            double rightBackPower  = axial + lateral - yaw;
+
+            leftFrontDrive.setPower(leftFrontPower);
+            rightFrontDrive.setPower(rightFrontPower);
+            leftBackDrive.setPower(leftBackPower);
+            rightBackDrive.setPower(rightBackPower);
+
+            odo.update();
+            position = odo.getPosition();
+            boolean run3 = Math.abs(position.getHeading(AngleUnit.DEGREES) - heading) > 10;
+            if (!run3) {
+                leftFrontDrive.setPower(0);
+                rightFrontDrive.setPower(0);
+                leftBackDrive.setPower(0);
+                rightBackDrive.setPower(0);
+                return;
+            }
+        }
+
+    }
 
     @Override
     public void runOpMode() throws InterruptedException {}

@@ -21,9 +21,13 @@ public class Main extends LinearOpMode {
 
         waitForStart();
         while (!isStopRequested()) {
+            customOdometry.turnTo(45);
+            sleep(600);
             customOdometry.moveTo(5, 5);
             sleep(600);
             customOdometry.moveTo(0, 0);
+            sleep(600);
+            customOdometry.turnTo(0);
             sleep(600);
             customOdometry.moveTo(-5, -5);
             sleep(600);
