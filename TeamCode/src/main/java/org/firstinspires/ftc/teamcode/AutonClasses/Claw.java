@@ -30,40 +30,24 @@ public class Claw extends LinearOpMode {
         claw.setPosition(0.5);
     }
 
-    public Action collect() {
-        return new Action() {
+    public void collect() {
 
-            @Override
-            public boolean run(@NonNull TelemetryPacket packet) {
+        wrist.setPosition(0.5);
+        sleep(500);
+        claw.setPosition(1.0);
+        sleep(2000);
+        reset();
 
-
-                wrist.setPosition(0.5);
-                sleep(500);
-                claw.setPosition(1.0);
-                sleep(2000);
-                reset();
-
-                return true;
-            }
-        };
     }
 
-    public Action eject() {
-        return new Action() {
+    public void eject() {
 
-            @Override
-            public boolean run(@NonNull TelemetryPacket packet) {
+        wrist.setPosition(0.5);
+        sleep(500);
+        claw.setPosition(1.0);
+        sleep(2000);
+        reset();
 
-
-                wrist.setPosition(0.5);
-                sleep(500);
-                claw.setPosition(1.0);
-                sleep(2000);
-                reset();
-
-                return true;
-            }
-        };
     }
 
 

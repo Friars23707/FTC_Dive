@@ -36,38 +36,22 @@ public class Slide extends LinearOpMode {
         slide.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
     }
 
-    public Action extend(boolean shouldWait) {
-        return new Action() {
+    public void extend(boolean shouldWait) {
 
-            @Override
-            public boolean run(@NonNull TelemetryPacket packet) {
+        move(1000, 200);
+        if (shouldWait) {
+            sleep(2000);
+        }
 
-
-                move(1000, 200);
-                if (shouldWait) {
-                    sleep(2000);
-                }
-
-                return true;
-            }
-        };
     }
 
-    public Action retract(boolean shouldWait) {
-        return new Action() {
+    public void retract(boolean shouldWait) {
 
-            @Override
-            public boolean run(@NonNull TelemetryPacket packet) {
+        move(0, 0);
+        if (shouldWait) {
+            sleep(2000);
+        }
 
-
-                move(0, 0);
-                if (shouldWait) {
-                    sleep(2000);
-                }
-
-                return true;
-            }
-        };
     }
 
     public void move(int armPos, int slidePos) {
