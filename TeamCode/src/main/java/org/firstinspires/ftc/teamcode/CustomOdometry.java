@@ -13,8 +13,9 @@ import org.firstinspires.ftc.robotcore.external.navigation.Pose2D;
 public class CustomOdometry extends LinearOpMode {
 
     final double ROBOT_SPEED = 0.3;
-
+    final double SLOW_SPEED = 0.1;
     double previousHeading = 0.0;
+
     GoBildaPinpointDriver odo;
     private DcMotor leftFrontDrive = null;
     private DcMotor leftBackDrive = null;
@@ -68,9 +69,12 @@ public class CustomOdometry extends LinearOpMode {
             currentX = position.getX(DistanceUnit.INCH);
             currentY = position.getY(DistanceUnit.INCH);
 
-            double axial = x > currentX ? ROBOT_SPEED : -ROBOT_SPEED;
-            double lateral = y > currentY ? -ROBOT_SPEED : ROBOT_SPEED;
+            double axial = x > currentX ? 1 : -1;
+            double lateral = y > currentY ? -1 : 1;
             double yaw = 0;
+
+            axial = Math.abs(position.getX(DistanceUnit.INCH) - x) > 10 ? axial*ROBOT_SPEED : axial*SLOW_SPEED;
+            lateral = Math.abs(position.getX(DistanceUnit.INCH) - y) > 10 ? lateral*ROBOT_SPEED : lateral*SLOW_SPEED;
 
             double leftFrontPower  = axial + lateral + yaw;
             double rightFrontPower = axial - lateral - yaw;
@@ -168,9 +172,12 @@ public class CustomOdometry extends LinearOpMode {
             currentY = position.getY(DistanceUnit.INCH);
             currentHeading = radToDeg(position.getHeading(AngleUnit.DEGREES));
 
-            double axial = x > currentX ? ROBOT_SPEED : -ROBOT_SPEED;
-            double lateral = y > currentY ? -ROBOT_SPEED : ROBOT_SPEED;
-            double yaw = heading <= currentHeading ? ROBOT_SPEED : -ROBOT_SPEED;;
+            double axial = x > currentX ? 1 : -1;
+            double lateral = y > currentY ? -1 : 1;
+            double yaw = heading <= currentHeading ? ROBOT_SPEED : -ROBOT_SPEED;
+
+            axial = Math.abs(position.getX(DistanceUnit.INCH) - x) > 10 ? axial*ROBOT_SPEED : axial*SLOW_SPEED;
+            lateral = Math.abs(position.getX(DistanceUnit.INCH) - y) > 10 ? lateral*ROBOT_SPEED : lateral*SLOW_SPEED;
 
             double leftFrontPower  = axial + lateral + yaw;
             double rightFrontPower = axial - lateral - yaw;
