@@ -49,11 +49,13 @@ public class CustomOdometry extends LinearOpMode {
         resetRuntime();
     }
 
-    public void moveTo(double x, double y) {
+    public void moveTo(double x, double y, double heading) {
         odo.update();
         Pose2D position = odo.getPosition();
         double currentX = position.getX(DistanceUnit.INCH);
         double currentY = position.getY(DistanceUnit.INCH);
+
+        previousHeading = heading;
 
         telem.addData("cancel", "true");
         telem.addData("Target: ", "{X: %.3f, Y: %.3f}", x, y);
@@ -88,8 +90,8 @@ public class CustomOdometry extends LinearOpMode {
 
             odo.update();
             position = odo.getPosition();
-            boolean run1 = Math.abs(position.getX(DistanceUnit.INCH) - x) > 1;
-            boolean run2 = Math.abs(position.getY(DistanceUnit.INCH) - y) > 1;
+            boolean run1 = Math.abs(position.getX(DistanceUnit.INCH) - x) > 0.2;
+            boolean run2 = Math.abs(position.getY(DistanceUnit.INCH) - y) > 0.2;
             if (!run1 && !run2) {
                 leftFrontDrive.setPower(0);
                 rightFrontDrive.setPower(0);
@@ -138,7 +140,7 @@ public class CustomOdometry extends LinearOpMode {
 
             odo.update();
             position = odo.getPosition();
-            boolean run3 = Math.abs(radToDeg(position.getHeading(AngleUnit.DEGREES)) - heading) > 5;
+            boolean run3 = Math.abs(radToDeg(position.getHeading(AngleUnit.DEGREES)) - heading) > 2;
             if (!run3) {
                 leftFrontDrive.setPower(0);
                 rightFrontDrive.setPower(0);
@@ -156,6 +158,8 @@ public class CustomOdometry extends LinearOpMode {
         double currentX = position.getX(DistanceUnit.INCH);
         double currentY = position.getY(DistanceUnit.INCH);
         double currentHeading = radToDeg(position.getHeading(AngleUnit.DEGREES));
+
+        previousHeading = heading;
 
         telem.addData("cancel", "true");
         telem.addData("Target: ", "{X: %.3f, Y: %.3f, Heading: %.3f}", x, y, heading);
@@ -191,14 +195,15 @@ public class CustomOdometry extends LinearOpMode {
 
             odo.update();
             position = odo.getPosition();
-            boolean run1 = Math.abs(position.getX(DistanceUnit.INCH) - x) > 1;
-            boolean run2 = Math.abs(position.getY(DistanceUnit.INCH) - y) > 1;
-            boolean run3 = Math.abs(radToDeg(position.getHeading(AngleUnit.DEGREES)) - heading) > 5;
+            boolean run1 = Math.abs(position.getX(DistanceUnit.INCH) - x) > 0.2;
+            boolean run2 = Math.abs(position.getY(DistanceUnit.INCH) - y) > 0.2;
+            boolean run3 = Math.abs(radToDeg(position.getHeading(AngleUnit.DEGREES)) - heading) > 2;
             if (!run1 && !run2 && !run3) {
                 leftFrontDrive.setPower(0);
                 rightFrontDrive.setPower(0);
                 leftBackDrive.setPower(0);
                 rightBackDrive.setPower(0);
+                turnTo(heading);
                 return;
             }
         }

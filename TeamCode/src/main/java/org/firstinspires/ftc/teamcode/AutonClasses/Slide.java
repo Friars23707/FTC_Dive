@@ -36,12 +36,12 @@ public class Slide extends LinearOpMode {
         slide.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         slide.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
-        move(50, 0);
+        move(20, 0);
     }
 
     public void extend(boolean shouldWait) {
 
-        move(1000, -200);
+        move(1500, -1500);
         if (shouldWait) {
             sleep(2000);
         }
@@ -50,7 +50,16 @@ public class Slide extends LinearOpMode {
 
     public void retract(boolean shouldWait) {
 
-        move(50, 0);
+        move(20, 0);
+        if (shouldWait) {
+            sleep(2000);
+        }
+
+    }
+
+    public void collection(boolean shouldWait) {
+
+        move(0, 0);
         if (shouldWait) {
             sleep(2000);
         }

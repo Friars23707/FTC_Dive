@@ -22,6 +22,8 @@ public class Claw extends LinearOpMode {
 
         claw = hwM.get(Servo.class, "claw");
         wrist = hwM.get(Servo.class, "wrist");
+
+        wrist.setPosition(0.5);
     }
 
     public void reset() {
@@ -35,8 +37,6 @@ public class Claw extends LinearOpMode {
         wrist.setPosition(0.5);
         sleep(500);
         claw.setPosition(0.0);
-        sleep(2000);
-        reset();
 
     }
 
