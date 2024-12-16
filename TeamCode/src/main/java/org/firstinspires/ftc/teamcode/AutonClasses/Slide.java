@@ -66,16 +66,23 @@ public class Slide extends LinearOpMode {
 
     }
 
+    private int lastArmPos = 0;
+
     public void move(int armPos, int slidePos) {
+        double armSpeed = lastArmPos >= armPos ? 0.6 : 0.3; //Fast up, slow down
+        lastArmPos = armPos;
+
         leftArm.setTargetPosition(armPos);
         leftArm.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        leftArm.setPower(0.3);
+        leftArm.setPower(armSpeed);
+        
         rightArm.setTargetPosition(armPos);
         rightArm.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        rightArm.setPower(0.3);
+        rightArm.setPower(armSpeed);
+
         slide.setTargetPosition(slidePos);
         slide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        slide.setPower(0.3);
+        slide.setPower(0.6);
     }
 
     @Override
