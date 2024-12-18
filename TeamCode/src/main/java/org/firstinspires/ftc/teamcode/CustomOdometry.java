@@ -182,6 +182,7 @@ public class CustomOdometry extends LinearOpMode {
 
             axial = Math.abs(position.getX(DistanceUnit.INCH) - x) > 10 ? axial*ROBOT_SPEED : axial*SLOW_SPEED;
             lateral = Math.abs(position.getX(DistanceUnit.INCH) - y) > 10 ? lateral*ROBOT_SPEED : lateral*SLOW_SPEED;
+            yaw = Math.abs(heading - currentHeading) > 10 ? yaw : 0;
 
             double leftFrontPower  = axial + lateral + yaw;
             double rightFrontPower = axial - lateral - yaw;

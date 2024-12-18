@@ -11,8 +11,7 @@ public class LeftAuton2 extends LinearOpMode {
     CustomOdometry customOdometry;
     Claw claw;
     Slide slide;
-
-    final private int[] bucketLocation = {48 , -2, 20};
+    final private int[] bucketLocation = {44 , -4, 25};
     final private int sampleY = -37;
 
     @Override
@@ -34,6 +33,7 @@ public class LeftAuton2 extends LinearOpMode {
 
         customOdometry.moveTo(bucketLocation[0], bucketLocation[1], bucketLocation[2]);
         claw.eject();
+        customOdometry.moveTo(bucketLocation[0]-10, bucketLocation[1]-10, 0);
         slide.retract(false);
 
         customOdometry.moveTo(27, -15, 0);
@@ -46,32 +46,22 @@ public class LeftAuton2 extends LinearOpMode {
         claw.reset();
         customOdometry.moveTo(bucketLocation[0], bucketLocation[1], bucketLocation[2]);
         claw.eject();
+        customOdometry.moveTo(bucketLocation[0]-10, bucketLocation[1]-10, 0);
         slide.retract(false);
 
         customOdometry.moveTo(36, sampleY, 0);
         slide.collection(false);
         claw.collect();
-        customOdometry.moveTo(40, sampleY, 0);
+        customOdometry.moveTo(40   , sampleY, 0);
         sleep(2000);
         slide.extend(false);
         claw.reset();
         customOdometry.moveTo(bucketLocation[0], bucketLocation[1], bucketLocation[2]);
         claw.eject();
+        customOdometry.moveTo(bucketLocation[0]-10, bucketLocation[1]-10, 0);
         slide.retract(false);
 
-/* RE ADD IF WE HAVE THE TIME FOR IT
-        customOdometry.moveTo(46, sampleY, 0);
-        slide.collection(false);
-        claw.collect();
-        customOdometry.moveTo(50, sampleY, 0);
-        sleep(2000);
-        claw.reset();
-        customOdometry.moveTo(bucketLocation[0], bucketLocation[1]-15, bucketLocation[2]);
-        slide.extend(true);
-        customOdometry.moveTo(bucketLocation[0], bucketLocation[1], bucketLocation[2]);
-        claw.eject();
-        slide.retract(false);
-*/
+
 
     }
 }

@@ -41,7 +41,7 @@ public class Slide extends LinearOpMode {
 
     public void extend(boolean shouldWait) {
 
-        move(1500, -1500);
+        move(1500, -2000);
         if (shouldWait) {
             sleep(2000);
         }
