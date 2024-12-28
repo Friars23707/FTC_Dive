@@ -12,8 +12,8 @@ import org.firstinspires.ftc.robotcore.external.navigation.Pose2D;
 
 public class CustomOdometry extends LinearOpMode {
 
-    final double ROBOT_SPEED = 0.3;
-    final double SLOW_SPEED = 0.1;
+    final double ROBOT_SPEED = 0.35;
+    final double SLOW_SPEED = 0.15;
     double previousHeading = 0.0;
 
     GoBildaPinpointDriver odo;
@@ -62,12 +62,10 @@ public class CustomOdometry extends LinearOpMode {
         telem.addData("Current: ", "{X: %.3f, Y: %.3f}", currentX, currentY);
         telem.update();
 
+        // Added a stability check to wait for odometry to be ready before moving
         while (!isStopRequested()) {
-            telem.addData("Target: ", "{X: %.3f, Y: %.3f}", x, y);
-            telem.addData("Current: ", "{X: %.3f, Y: %.3f}", currentX, currentY);
-            telem.addData("In loop", "true");
-            telem.update();
-
+            odo.update();
+            position = odo.getPosition();
             currentX = position.getX(DistanceUnit.INCH);
             currentY = position.getY(DistanceUnit.INCH);
 
@@ -75,9 +73,14 @@ public class CustomOdometry extends LinearOpMode {
             double lateral = y > currentY ? -1 : 1;
             double yaw = 0;
 
-            axial = Math.abs(position.getX(DistanceUnit.INCH) - x) > 10 ? axial*ROBOT_SPEED : axial*SLOW_SPEED;
-            lateral = Math.abs(position.getX(DistanceUnit.INCH) - y) > 10 ? lateral*ROBOT_SPEED : lateral*SLOW_SPEED;
+            // Reduced the distance thresholds for fine-tuning movements
+            double distanceToX = Math.abs(position.getX(DistanceUnit.INCH) - x);
+            double distanceToY = Math.abs(position.getY(DistanceUnit.INCH) - y);
 
+            axial = distanceToX > 6 ? axial * ROBOT_SPEED : axial * SLOW_SPEED;
+            lateral = distanceToY > 6 ? lateral * ROBOT_SPEED : lateral * SLOW_SPEED;
+
+            // Motor power calculation
             double leftFrontPower  = axial + lateral + yaw;
             double rightFrontPower = axial - lateral - yaw;
             double leftBackPower   = axial - lateral + yaw;
@@ -88,20 +91,29 @@ public class CustomOdometry extends LinearOpMode {
             leftBackDrive.setPower(leftBackPower);
             rightBackDrive.setPower(rightBackPower);
 
-            odo.update();
-            position = odo.getPosition();
-            boolean run1 = Math.abs(position.getX(DistanceUnit.INCH) - x) > 0.2;
-            boolean run2 = Math.abs(position.getY(DistanceUnit.INCH) - y) > 0.2;
+            // Adding a small delay to allow time for the motors to respond
+            sleep(20);  // Can be adjusted based on your motor responsiveness
+
+            // Recheck the distances with tighter thresholds
+            boolean run1 = Math.abs(position.getX(DistanceUnit.INCH) - x) > 0.4;
+            boolean run2 = Math.abs(position.getY(DistanceUnit.INCH) - y) > 0.4;
+
+            telem.addData("run1", run1);
+            telem.addData("run2", run2  );
+            telem.addData("Target: ", "{X: %.3f, Y: %.3f}", x, y);
+            telem.addData("Current: ", "{X: %.3f, Y: %.3f}", currentX, currentY);
+            telem.update();
+
+            // Ensure both X and Y are within tolerance
             if (!run1 && !run2) {
                 leftFrontDrive.setPower(0);
                 rightFrontDrive.setPower(0);
                 leftBackDrive.setPower(0);
                 rightBackDrive.setPower(0);
-                turnTo(previousHeading);
+                turnTo(previousHeading); // Turn to the desired heading once the position is reached
                 return;
             }
         }
-
     }
 
     public void turnTo(double heading) {
@@ -151,6 +163,7 @@ public class CustomOdometry extends LinearOpMode {
         }
 
     }
+
 
     public void moveToWithHeading(double x, double y, double heading) {
         odo.update();

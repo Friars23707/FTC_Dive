@@ -59,7 +59,7 @@ public class Slide extends LinearOpMode {
 
     public void collection(boolean shouldWait) {
 
-        move(0, 0);
+        move(0, -60);
         if (shouldWait) {
             sleep(2000);
         }
@@ -69,7 +69,7 @@ public class Slide extends LinearOpMode {
     private int lastArmPos = 0;
 
     public void move(int armPos, int slidePos) {
-        double armSpeed = lastArmPos >= armPos ? 0.6 : 0.3; //Fast up, slow down
+        double armSpeed = lastArmPos <= armPos ? 0.7 : 0.5; //Fast up, slow down
         lastArmPos = armPos;
 
         leftArm.setTargetPosition(armPos);

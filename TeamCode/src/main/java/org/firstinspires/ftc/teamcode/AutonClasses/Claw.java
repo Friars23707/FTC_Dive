@@ -23,7 +23,7 @@ public class Claw extends LinearOpMode {
         claw = hwM.get(Servo.class, "claw");
         wrist = hwM.get(Servo.class, "wrist");
 
-        wrist.setPosition(0.5);
+        wrist.setPosition(0.84);
     }
 
     public void reset() {
@@ -48,7 +48,13 @@ public class Claw extends LinearOpMode {
         reset();
 
     }
+    public void side() {
 
+        wrist.setPosition(0.84);
+        sleep(500);
+        claw.setPosition(0.5);
+
+    }
 
     @Override
     public void runOpMode() throws InterruptedException {
