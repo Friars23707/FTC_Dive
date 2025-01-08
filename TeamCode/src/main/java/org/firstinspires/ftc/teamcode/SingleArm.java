@@ -8,10 +8,13 @@ package org.firstinspires.ftc.teamcode;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.ColorRangeSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
+
+import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 
 
 @TeleOp(name="SingleArm", group="TeleOps")
@@ -31,6 +34,8 @@ public class SingleArm extends LinearOpMode {
     public Servo claw = null;
     public Servo wrist = null;
 
+    public ColorRangeSensor sampleSensor = null;
+
     @Override
     public void runOpMode() throws InterruptedException {
 
@@ -47,6 +52,8 @@ public class SingleArm extends LinearOpMode {
 
         claw = hardwareMap.get(Servo.class, "claw");
         wrist = hardwareMap.get(Servo.class, "wrist");
+
+        sampleSensor = hardwareMap.get(ColorRangeSensor.class, "sample_sens");
 
 
         leftFrontDrive.setDirection(DcMotor.Direction.REVERSE);
@@ -203,6 +210,22 @@ public class SingleArm extends LinearOpMode {
             claw.setPosition(clawPower);
             wrist.setPosition(wristPos);
 
+            int sampleRed = sampleSensor.red();
+            int sampleGreen = sampleSensor.green();
+            int sampleBlue = sampleSensor.blue();
+            double lightColor1;
+
+            if (sampleRed >= sampleBlue && sampleRed >= sampleGreen) {
+                lightColor1 = 0.279;
+            } else if (sampleBlue >= sampleRed && sampleBlue >= sampleGreen) {
+                lightColor1 = 0.611;
+            } else {
+                lightColor1 = 0.388;
+            }
+
+            double sampleDistance = sampleSensor.getDistance(DistanceUnit.INCH);
+            double lightColor2 = smoothMap(sampleDistance);
+
             // Show the elapsed game time and wheel power.
             telemetry.addData("Wrist", wrist.getPosition());
             telemetry.addData("Claw Input", clawPower);
@@ -212,6 +235,9 @@ public class SingleArm extends LinearOpMode {
             telemetry.addData("Status", "Run Time: " + runtime.toString());
             telemetry.addData("Front left/Right", "%4.2f, %4.2f", leftFrontPower, rightFrontPower);
             telemetry.addData("Back  left/Right", "%4.2f, %4.2f", leftBackPower, rightBackPower);
+            telemetry.addData("Sample Color", lightColor1);
+            telemetry.addData("Sample Distance", sampleDistance);
+            telemetry.addData("Sample Distance Clr", lightColor2);
             telemetry.update();
         }
 
@@ -220,5 +246,24 @@ public class SingleArm extends LinearOpMode {
         //Set the power for all encoders ((LEFT AND RIGHT ARM MUST MATCH OR KABOOM))
         leftArm.setPower(pow);
         rightArm.setPower(pow);
+    }
+
+    //SMOOTH MAP LINE CREATION
+    double x1 = 0.2, y1 = 0.5;
+    double x2 = 3.5, y2 = 0.279;
+
+    // Linear interpolation formula
+    double slope = (y2 - y1) / (x2 - x1);
+    double intercept = y1 - slope * x1;
+
+    public double smoothMap(double input) {
+        // Apply linear interpolation to get the result
+        double output = slope * input + intercept;
+
+        //Apply limits to the color range
+        output = Math.min(output, 0.6);
+        output = Math.max(output, 0.279);
+
+        return output;
     }
 }
