@@ -6,7 +6,7 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import org.firstinspires.ftc.teamcode.AutonClasses.Claw;
 import org.firstinspires.ftc.teamcode.AutonClasses.Slide;
 
-@Autonomous(name = "W Autos")
+@Autonomous(name = "Bucket Left")
 public class LeftAuton2 extends LinearOpMode {
     CustomOdometry customOdometry;
     Claw claw;

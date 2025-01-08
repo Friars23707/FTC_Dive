@@ -13,3 +13,4 @@
 ### Competition Files
 - SingleArm - MAIN TELEOP FILE
 - LeftAuton2 - AUTO FOR BUCKET SIDE
+- RightAuton1 - AUTO FOR SPECIMEN SIDE

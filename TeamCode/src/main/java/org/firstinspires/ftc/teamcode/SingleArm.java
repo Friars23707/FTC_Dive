@@ -36,6 +36,9 @@ public class SingleArm extends LinearOpMode {
 
     public ColorRangeSensor sampleSensor = null;
 
+    public Servo leftLight = null;
+    public Servo rightLight = null;
+
     @Override
     public void runOpMode() throws InterruptedException {
 
@@ -55,6 +58,8 @@ public class SingleArm extends LinearOpMode {
 
         sampleSensor = hardwareMap.get(ColorRangeSensor.class, "sample_sens");
 
+        leftLight = hardwareMap.get(Servo.class, "left_tower");
+        rightLight = hardwareMap.get(Servo.class, "right_tower");
 
         leftFrontDrive.setDirection(DcMotor.Direction.REVERSE);
         leftBackDrive.setDirection(DcMotor.Direction.REVERSE);
@@ -107,8 +112,8 @@ public class SingleArm extends LinearOpMode {
             double leftBackPower   = axial - lateral + yaw;
             double rightBackPower  = axial + lateral - yaw;
 
-            final double WRIST_FOLDED_IN   = 0.8333;
-            final double WRIST_FOLDED_OUT  = 0.5;
+            final double WRIST_FOLDED_IN   = 0.12;
+            final double WRIST_FOLDED_OUT  = 0.48;
 
 
             // Normalize the values so no wheel power exceeds 100%
@@ -223,8 +228,12 @@ public class SingleArm extends LinearOpMode {
                 lightColor1 = 0.388;
             }
 
+            leftLight.setPosition(lightColor1);
+
             double sampleDistance = sampleSensor.getDistance(DistanceUnit.INCH);
             double lightColor2 = smoothMap(sampleDistance);
+
+            rightLight.setPosition(lightColor2);
 
             // Show the elapsed game time and wheel power.
             telemetry.addData("Wrist", wrist.getPosition());
@@ -250,7 +259,7 @@ public class SingleArm extends LinearOpMode {
 
     //SMOOTH MAP LINE CREATION
     double x1 = 0.2, y1 = 0.5;
-    double x2 = 3.5, y2 = 0.279;
+    double x2 = 1.4, y2 = 0.279;
 
     // Linear interpolation formula
     double slope = (y2 - y1) / (x2 - x1);
