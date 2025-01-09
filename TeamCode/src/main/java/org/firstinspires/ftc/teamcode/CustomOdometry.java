@@ -54,6 +54,7 @@ public class CustomOdometry extends LinearOpMode {
         Pose2D position = odo.getPosition();
         double currentX = position.getX(DistanceUnit.INCH);
         double currentY = position.getY(DistanceUnit.INCH);
+        double currentHeading = position.getHeading(AngleUnit.RADIANS);
 
         previousHeading = heading;
 
@@ -68,6 +69,7 @@ public class CustomOdometry extends LinearOpMode {
             position = odo.getPosition();
             currentX = position.getX(DistanceUnit.INCH);
             currentY = position.getY(DistanceUnit.INCH);
+            currentHeading = position.getHeading(AngleUnit.RADIANS);
 
             double axial = x > currentX ? 1 : -1;
             double lateral = y > currentY ? -1 : 1;
@@ -80,11 +82,14 @@ public class CustomOdometry extends LinearOpMode {
             axial = distanceToX > 6 ? axial * ROBOT_SPEED : axial * SLOW_SPEED;
             lateral = distanceToY > 6 ? lateral * ROBOT_SPEED : lateral * SLOW_SPEED;
 
+            double rotLateral = lateral * Math.cos(-currentHeading) - axial * Math.sin(-currentHeading);
+            double rotAxial = lateral * Math.sin(-currentHeading) + axial * Math.cos(-currentHeading);
+
             // Motor power calculation
-            double leftFrontPower  = axial + lateral + yaw;
-            double rightFrontPower = axial - lateral - yaw;
-            double leftBackPower   = axial - lateral + yaw;
-            double rightBackPower  = axial + lateral - yaw;
+            double leftFrontPower  = rotAxial + rotLateral + yaw;
+            double rightFrontPower = rotAxial - rotLateral - yaw;
+            double leftBackPower   = rotAxial - rotLateral + yaw;
+            double rightBackPower  = rotAxial + rotLateral - yaw;
 
             leftFrontDrive.setPower(leftFrontPower);
             rightFrontDrive.setPower(rightFrontPower);

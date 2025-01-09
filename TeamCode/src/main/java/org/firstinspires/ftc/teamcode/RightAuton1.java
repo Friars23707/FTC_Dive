@@ -11,8 +11,8 @@ public class RightAuton1 extends LinearOpMode {
     CustomOdometry customOdometry;
     Claw claw;
     Slide slide;
-    final private double[] specimenPickup = {3 , -13, 180};
-    final private double[] specimenDropoff = {22 , 10, 0};
+    final private double[] specimenPickup = {3 , -13, 90};
+    final private double[] specimenDropoff = {24 , 10, 0};
 
     @Override
     public void runOpMode() throws InterruptedException {
@@ -39,7 +39,7 @@ public class RightAuton1 extends LinearOpMode {
         slide.collection(false);
         claw.collect();
         customOdometry.moveTo(specimenPickup[0], specimenPickup[1], specimenPickup[2]);
-        customOdometry.moveTo(0, specimenPickup[1], specimenPickup[2]);
+        customOdometry.moveTo(specimenPickup[0], specimenPickup[1]-5, specimenPickup[2]);
         claw.reset();
 
     }

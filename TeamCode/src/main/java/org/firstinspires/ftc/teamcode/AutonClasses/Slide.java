@@ -68,7 +68,7 @@ public class Slide extends LinearOpMode {
 
     public void highRung(boolean shouldWait) {
 
-        move(800, -1000);
+        move(1300, -1500);
         if (shouldWait) {
             sleep(2000);
         }
