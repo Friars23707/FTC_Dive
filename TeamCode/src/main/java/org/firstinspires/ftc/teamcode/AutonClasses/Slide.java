@@ -66,6 +66,24 @@ public class Slide extends LinearOpMode {
 
     }
 
+    public void highRung(boolean shouldWait) {
+
+        move(800, -1000);
+        if (shouldWait) {
+            sleep(2000);
+        }
+
+    }
+
+    public void highRungBack(boolean shouldWait) {
+
+        move(600, -800);
+        if (shouldWait) {
+            sleep(2000);
+        }
+
+    }
+
     private int lastArmPos = 0;
 
     public void move(int armPos, int slidePos) {

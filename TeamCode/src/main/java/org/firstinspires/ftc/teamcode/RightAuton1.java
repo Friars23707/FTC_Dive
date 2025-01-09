@@ -28,16 +28,19 @@ public class RightAuton1 extends LinearOpMode {
         waitForStart();
 
 
-        slide.extend(false);
-        claw.collect();
+        slide.highRung(false);
+        claw.side();
 
-        customOdometry.moveTo(bucketLocation[0], bucketLocation[1], bucketLocation[2]);
+        customOdometry.moveTo(specimenDropoff[0], specimenDropoff[1], specimenDropoff[2]);
         telemetry.addData("MOVETOFINISHED", true);
         telemetry.update();
-        claw.eject();
-        customOdometry.moveTo(bucketLocation[0]-10, bucketLocation[1]-10, 0);
-        slide.retract(false);
+        slide.highRungBack(true);
 
+        slide.collection(false);
+        claw.collect();
+        customOdometry.moveTo(specimenPickup[0], specimenPickup[1], specimenPickup[2]);
+        customOdometry.moveTo(0, specimenPickup[1], specimenPickup[2]);
+        claw.reset();
 
     }
 }
