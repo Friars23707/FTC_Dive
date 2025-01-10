@@ -253,9 +253,9 @@ public class SingleArm extends OpMode {
         rightLight.setPosition(lightColor2);
 
         if (lightColor1 == 0.279 && !redAlliance) {
-            claw.setPosition(1.0);
+            clawPower = 1.0;
         } else if (lightColor1 == 0.611 && redAlliance) {
-            claw.setPosition(1.0);
+            clawPower = 1.0;
         }
 
         claw.setPosition(clawPower);
@@ -273,6 +273,7 @@ public class SingleArm extends OpMode {
         telemetry.addData("Sample Color", lightColor1);
         telemetry.addData("Sample Distance", sampleDistance);
         telemetry.addData("Sample Distance Clr", lightColor2);
+        telemetry.addData("Alliance", redAlliance ? "Red" : "Blue");
         telemetry.update();
     }
 
