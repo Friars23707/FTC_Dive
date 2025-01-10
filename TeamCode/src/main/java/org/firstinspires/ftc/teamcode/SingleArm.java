@@ -7,6 +7,7 @@ package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.ColorRangeSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -18,7 +19,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 
 
 @TeleOp(name="SingleArm", group="TeleOps")
-public class SingleArm extends LinearOpMode {
+public class SingleArm extends OpMode {
 
     int armPos = 0;
 
@@ -39,9 +40,16 @@ public class SingleArm extends LinearOpMode {
     public Servo leftLight = null;
     public Servo rightLight = null;
 
-    @Override
-    public void runOpMode() throws InterruptedException {
+    int armTarget = 0;
+    int slideTarget = 0;
 
+    double clawPower = 0.5;
+    double wristPos = 0.5;
+
+    boolean redAlliance = false;
+
+    @Override
+    public void init() {
         // Initialize the hardware variables. Note that the strings used here must correspond
         // to the names assigned during the robot configuration step on the DS or RC devices.
         leftFrontDrive  = hardwareMap.get(DcMotor.class, "front_left");
@@ -83,61 +91,70 @@ public class SingleArm extends LinearOpMode {
         slide.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         slide.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
+
+    }
+
+    @Override
+    public void init_loop() {
         // Wait for the game to start (driver presses PLAY)
         telemetry.addData("Status", "Initialized");
+        telemetry.addData("Alliance", redAlliance ? "Red" : "Blue");
         telemetry.update();
 
-        waitForStart();
+        if (gamepad1.x) {
+            redAlliance = false;
+        } else if (gamepad1.b) {
+            redAlliance = true;
+        }
+    }
+
+    @Override
+    public  void start() {
         runtime.reset();
+    }
 
-        int armTarget = 0;
-        int slideTarget = 0;
+    @Override
+    public void loop() {
+        double max;
 
-        double clawPower = 0.5;
-        double wristPos = wrist.getPosition();
+        // POV Mode uses left joystick to go forward & strafe, and right joystick to rotate.
+        double axial   = -gamepad1.left_stick_y;  // Note: pushing stick forward gives negative value
+        double lateral =  gamepad1.left_stick_x;
+        double yaw     =  gamepad1.right_stick_x;
 
-        // run until the end of the match (driver presses STOP)
-        while (opModeIsActive()) {
-            double max;
+        // Combine the joystick requests for each axis-motion to determine each wheel's power.
+        // Set up a variable for each drive wheel to save the power level for telemetry.
+        double leftFrontPower  = axial + lateral + yaw;
+        double rightFrontPower = axial - lateral - yaw;
+        double leftBackPower   = axial - lateral + yaw;
+        double rightBackPower  = axial + lateral - yaw;
 
-            // POV Mode uses left joystick to go forward & strafe, and right joystick to rotate.
-            double axial   = -gamepad1.left_stick_y;  // Note: pushing stick forward gives negative value
-            double lateral =  gamepad1.left_stick_x;
-            double yaw     =  gamepad1.right_stick_x;
-
-            // Combine the joystick requests for each axis-motion to determine each wheel's power.
-            // Set up a variable for each drive wheel to save the power level for telemetry.
-            double leftFrontPower  = axial + lateral + yaw;
-            double rightFrontPower = axial - lateral - yaw;
-            double leftBackPower   = axial - lateral + yaw;
-            double rightBackPower  = axial + lateral - yaw;
-
-            final double WRIST_FOLDED_IN   = 0.12;
-            final double WRIST_FOLDED_OUT  = 0.48;
+        final double WRIST_FOLDED_IN   = 0.12;
+        final double WRIST_FOLDED_OUT  = 0.48;
 
 
-            // Normalize the values so no wheel power exceeds 100%
-            // This ensures that the robot maintains the desired motion.
-            max = Math.max(Math.abs(leftFrontPower), Math.abs(rightFrontPower));
-            max = Math.max(max, Math.abs(leftBackPower));
-            max = Math.max(max, Math.abs(rightBackPower));
+        // Normalize the values so no wheel power exceeds 100%
+        // This ensures that the robot maintains the desired motion.
+        max = Math.max(Math.abs(leftFrontPower), Math.abs(rightFrontPower));
+        max = Math.max(max, Math.abs(leftBackPower));
+        max = Math.max(max, Math.abs(rightBackPower));
 
-            if (max > 1.0) {
-                leftFrontPower  /= max;
-                rightFrontPower /= max;
-                leftBackPower   /= max;
-                rightBackPower  /= max;
-            }
+        if (max > 1.0) {
+            leftFrontPower  /= max;
+            rightFrontPower /= max;
+            leftBackPower   /= max;
+            rightBackPower  /= max;
+        }
 
-            // This is test code:
-            //
-            // Uncomment the following code to test your motor directions.
-            // Each button should make the corresponding motor run FORWARD.
-            //   1) First get all the motors to take to correct positions on the robot
-            //      by adjusting your Robot Configuration if necessary.
-            //   2) Then make sure they run in the correct direction by modifying the
-            //      the setDirection() calls above.
-            // Once the correct motors move in the correct direction re-comment this code.
+        // This is test code:
+        //
+        // Uncomment the following code to test your motor directions.
+        // Each button should make the corresponding motor run FORWARD.
+        //   1) First get all the motors to take to correct positions on the robot
+        //      by adjusting your Robot Configuration if necessary.
+        //   2) Then make sure they run in the correct direction by modifying the
+        //      the setDirection() calls above.
+        // Once the correct motors move in the correct direction re-comment this code.
 
 /*
             leftFrontPower  = gamepad1.x ? 1.0 : 0.0;  // X gamepad
@@ -146,111 +163,119 @@ public class SingleArm extends LinearOpMode {
             rightBackPower  = gamepad1.b ? 1.0 : 0.0;  // B gamepad
 */
 
-            // Send calculated power to wheels
-            leftFrontDrive.setPower(leftFrontPower);
-            rightFrontDrive.setPower(rightFrontPower);
-            leftBackDrive.setPower(leftBackPower);
-            rightBackDrive.setPower(rightBackPower);
+        // Send calculated power to wheels
+        leftFrontDrive.setPower(leftFrontPower);
+        rightFrontDrive.setPower(rightFrontPower);
+        leftBackDrive.setPower(leftBackPower);
+        rightBackDrive.setPower(rightBackPower);
 
-            // Erlis' (stolen) arm code [its logans]
-            if (gamepad2.dpad_down) { //FLOOR INTAKE
-                setArmPow(0.5);
-                armTarget = 0;
-            } else if (gamepad2.dpad_left) { //SUB INTAKE
-                setArmPow(0.5);
-                armTarget = 150;
-            } else if (gamepad2.dpad_up) { //LOW BASKET
-                setArmPow(0.4);
-                armTarget = 1000;
-            } else if (gamepad2.dpad_right) { //HIGH BASKET
-                setArmPow(0.4);
-                armTarget = 1500;
-            } else {
-                armTarget = leftArm.getTargetPosition();
-            }
-
-            if (gamepad2.left_stick_y != 0) {
-                armTarget = leftArm.getCurrentPosition() - Math.round(gamepad2.left_stick_y*50);
-            }
-
-
-            if (gamepad2.right_bumper) {
-                leftArm.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-                rightArm.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-            }
-
-            leftArm.setTargetPosition(armTarget);
-            leftArm.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-            rightArm.setTargetPosition(armTarget);
-            rightArm.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-
-            // Slide Code
-            slide.setPower(0.5);
-
-            if (gamepad2.right_stick_y != 0) {
-                slideTarget = slide.getCurrentPosition() + Math.round(gamepad2.right_stick_y*50);
-            } else {
-                slideTarget = slide.getCurrentPosition();
-            }
-
-            slide.setTargetPosition(slideTarget);
-            slide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-
-            if (gamepad2.y) {
-                clawPower = 1.0;
-            } else if (gamepad2.a) {
-                clawPower = 0.0;
-            } else {
-                clawPower = 0.5;
-            }
-
-            if (gamepad2.x) {
-                wristPos = (WRIST_FOLDED_IN);
-            } else if (gamepad2.b) {
-                wristPos = (WRIST_FOLDED_OUT);
-            }
-
-            // wristPower = gamepad2.dpad_left ? 1 : 0;
-            // claw.setDirection(Servo.Direction.FORWARD);
-            claw.setPosition(clawPower);
-            wrist.setPosition(wristPos);
-
-            int sampleRed = sampleSensor.red();
-            int sampleGreen = sampleSensor.green();
-            int sampleBlue = sampleSensor.blue();
-            double lightColor1;
-
-            if (sampleRed >= sampleBlue && sampleRed >= sampleGreen) {
-                lightColor1 = 0.279;
-            } else if (sampleBlue >= sampleRed && sampleBlue >= sampleGreen) {
-                lightColor1 = 0.611;
-            } else {
-                lightColor1 = 0.388;
-            }
-
-            leftLight.setPosition(lightColor1);
-
-            double sampleDistance = sampleSensor.getDistance(DistanceUnit.INCH);
-            double lightColor2 = smoothMap(sampleDistance);
-
-            rightLight.setPosition(lightColor2);
-
-            // Show the elapsed game time and wheel power.
-            telemetry.addData("Wrist", wrist.getPosition());
-            telemetry.addData("Claw Input", clawPower);
-            telemetry.addData("Claw", claw.getPosition());
-            telemetry.addData("Slide", slideTarget+" : "+slide.getCurrentPosition());
-            telemetry.addData("Arm", armTarget+" : "+leftArm.getCurrentPosition());
-            telemetry.addData("Status", "Run Time: " + runtime.toString());
-            telemetry.addData("Front left/Right", "%4.2f, %4.2f", leftFrontPower, rightFrontPower);
-            telemetry.addData("Back  left/Right", "%4.2f, %4.2f", leftBackPower, rightBackPower);
-            telemetry.addData("Sample Color", lightColor1);
-            telemetry.addData("Sample Distance", sampleDistance);
-            telemetry.addData("Sample Distance Clr", lightColor2);
-            telemetry.update();
+        // Erlis' (stolen) arm code [its logans]
+        if (gamepad2.dpad_down) { //FLOOR INTAKE
+            setArmPow(0.5);
+            armTarget = 0;
+        } else if (gamepad2.dpad_left) { //SUB INTAKE
+            setArmPow(0.5);
+            armTarget = 150;
+        } else if (gamepad2.dpad_up) { //LOW BASKET
+            setArmPow(0.4);
+            armTarget = 1000;
+        } else if (gamepad2.dpad_right) { //HIGH BASKET
+            setArmPow(0.4);
+            armTarget = 1500;
+        } else {
+            armTarget = leftArm.getTargetPosition();
         }
 
+        if (gamepad2.left_stick_y != 0) {
+            setArmPow(0.5);
+            armTarget = leftArm.getCurrentPosition() - Math.round(gamepad2.left_stick_y*50);
+        }
+
+
+        if (gamepad2.right_bumper) {
+            leftArm.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+            rightArm.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+            slide.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        }
+
+        leftArm.setTargetPosition(armTarget);
+        leftArm.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        rightArm.setTargetPosition(armTarget);
+        rightArm.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+
+        // Slide Code
+        slide.setPower(0.5);
+
+        if (gamepad2.right_stick_y != 0) {
+            slideTarget = slide.getCurrentPosition() + Math.round(gamepad2.right_stick_y*50);
+        } else {
+            slideTarget = slide.getCurrentPosition();
+        }
+
+        slide.setTargetPosition(slideTarget);
+        slide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+
+        if (gamepad2.y) {
+            clawPower = 1.0;
+        } else if (gamepad2.a) {
+            clawPower = 0.0;
+        } else {
+            clawPower = 0.5;
+        }
+
+        if (gamepad2.x) {
+            wristPos = (WRIST_FOLDED_IN);
+        } else if (gamepad2.b) {
+            wristPos = (WRIST_FOLDED_OUT);
+        }
+
+        // wristPower = gamepad2.dpad_left ? 1 : 0;
+        // claw.setDirection(Servo.Direction.FORWARD);
+
+        int sampleRed = sampleSensor.red();
+        int sampleGreen = sampleSensor.green();
+        int sampleBlue = sampleSensor.blue();
+        double lightColor1;
+
+        if (sampleRed >= sampleBlue && sampleRed >= sampleGreen) {
+            lightColor1 = 0.279;
+        } else if (sampleBlue >= sampleRed && sampleBlue >= sampleGreen) {
+            lightColor1 = 0.611;
+        } else {
+            lightColor1 = 0.388;
+        }
+
+        leftLight.setPosition(lightColor1);
+
+        double sampleDistance = sampleSensor.getDistance(DistanceUnit.INCH);
+        double lightColor2 = smoothMap(sampleDistance);
+
+        rightLight.setPosition(lightColor2);
+
+        if (lightColor1 == 0.279 && !redAlliance) {
+            claw.setPosition(1.0);
+        } else if (lightColor1 == 0.611 && redAlliance) {
+            claw.setPosition(1.0);
+        }
+
+        claw.setPosition(clawPower);
+        wrist.setPosition(wristPos);
+
+        // Show the elapsed game time and wheel power.
+        telemetry.addData("Wrist", wrist.getPosition());
+        telemetry.addData("Claw Input", clawPower);
+        telemetry.addData("Claw", claw.getPosition());
+        telemetry.addData("Slide", slideTarget+" : "+slide.getCurrentPosition());
+        telemetry.addData("Arm", armTarget+" : "+leftArm.getCurrentPosition());
+        telemetry.addData("Status", "Run Time: " + runtime.toString());
+        telemetry.addData("Front left/Right", "%4.2f, %4.2f", leftFrontPower, rightFrontPower);
+        telemetry.addData("Back  left/Right", "%4.2f, %4.2f", leftBackPower, rightBackPower);
+        telemetry.addData("Sample Color", lightColor1);
+        telemetry.addData("Sample Distance", sampleDistance);
+        telemetry.addData("Sample Distance Clr", lightColor2);
+        telemetry.update();
     }
+
     public void setArmPow(double pow) {
         //Set the power for all encoders ((LEFT AND RIGHT ARM MUST MATCH OR KABOOM))
         leftArm.setPower(pow);
@@ -275,4 +300,5 @@ public class SingleArm extends LinearOpMode {
 
         return output;
     }
+
 }
