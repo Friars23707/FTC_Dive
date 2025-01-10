@@ -169,6 +169,107 @@ public class CustomOdometry extends LinearOpMode {
 
     }
 
+    public void GPTmoveTo(double x, double y, double heading) {
+        odo.update();
+        Pose2D position = odo.getPosition();
+        double currentX = position.getX(DistanceUnit.INCH);
+        double currentY = position.getY(DistanceUnit.INCH);
+        double currentHeading = position.getHeading(AngleUnit.RADIANS);
+
+        previousHeading = heading;
+
+        telem.addData("cancel", "true");
+        telem.addData("Target: ", "{X: %.3f, Y: %.3f}", x, y);
+        telem.addData("Current: ", "{X: %.3f, Y: %.3f}", currentX, currentY);
+        telem.update();
+
+        // Calculate the direction in the robot's local coordinate frame
+        double deltaX = x - currentX;
+        double deltaY = y - currentY;
+
+        // Calculate the angle the robot needs to move towards
+        double targetAngle = Math.atan2(deltaY, deltaX);
+
+        // The robot needs to rotate to this target angle relative to its current heading
+        double deltaHeading = targetAngle - currentHeading;
+
+        // Normalize deltaHeading to be between -PI and PI
+        if (deltaHeading > Math.PI) {
+            deltaHeading -= 2 * Math.PI;
+        } else if (deltaHeading < -Math.PI) {
+            deltaHeading += 2 * Math.PI;
+        }
+
+        // Rotate the robot towards the target angle first
+        turnTo(currentHeading + deltaHeading);  // Turn robot towards the target direction
+
+        // Now proceed to move towards the target
+        while (!isStopRequested()) {
+            odo.update();
+            position = odo.getPosition();
+            currentX = position.getX(DistanceUnit.INCH);
+            currentY = position.getY(DistanceUnit.INCH);
+            currentHeading = position.getHeading(AngleUnit.RADIANS);
+
+            // Calculate remaining distance to target
+            double distanceToX = Math.abs(position.getX(DistanceUnit.INCH) - x);
+            double distanceToY = Math.abs(position.getY(DistanceUnit.INCH) - y);
+
+            // Dynamically adjust speed based on distance
+            double axial = distanceToX > 6 ? ROBOT_SPEED : SLOW_SPEED;  // Adjust as needed
+            double lateral = distanceToY > 6 ? ROBOT_SPEED : SLOW_SPEED;
+
+            // Calculate movement in robot's local frame
+            double rotLateral = lateral * Math.cos(-currentHeading) - axial * Math.sin(-currentHeading);
+            double rotAxial = lateral * Math.sin(-currentHeading) + axial * Math.cos(-currentHeading);
+
+            // Motor power calculation
+            double leftFrontPower  = rotAxial + rotLateral;
+            double rightFrontPower = rotAxial - rotLateral;
+            double leftBackPower   = rotAxial - rotLateral;
+            double rightBackPower  = rotAxial + rotLateral;
+
+            // Normalize motor powers if needed
+            double maxPower = Math.max(Math.abs(leftFrontPower), Math.max(Math.abs(rightFrontPower),
+                    Math.max(Math.abs(leftBackPower), Math.abs(rightBackPower))));
+            if (maxPower > 1.0) {
+                leftFrontPower /= maxPower;
+                rightFrontPower /= maxPower;
+                leftBackPower /= maxPower;
+                rightBackPower /= maxPower;
+            }
+
+            // Set motor powers
+            leftFrontDrive.setPower(leftFrontPower);
+            rightFrontDrive.setPower(rightFrontPower);
+            leftBackDrive.setPower(leftBackPower);
+            rightBackDrive.setPower(rightBackPower);
+
+            // Small delay for motors to respond
+            sleep(20);
+
+            // Check if the target is within tolerance (adjusted tolerance value)
+            boolean run1 = Math.abs(position.getX(DistanceUnit.INCH) - x) > 0.2;
+            boolean run2 = Math.abs(position.getY(DistanceUnit.INCH) - y) > 0.2;
+
+            telem.addData("run1", run1);
+            telem.addData("run2", run2);
+            telem.addData("Target: ", "{X: %.3f, Y: %.3f}", x, y);
+            telem.addData("Current: ", "{X: %.3f, Y: %.3f}", currentX, currentY);
+            telem.update();
+
+            // Exit loop when both X and Y are within tolerance
+            if (!run1 && !run2) {
+                leftFrontDrive.setPower(0);
+                rightFrontDrive.setPower(0);
+                leftBackDrive.setPower(0);
+                rightBackDrive.setPower(0);
+                return;
+            }
+        }
+    }
+
+
 
     public void moveToWithHeading(double x, double y, double heading) {
         odo.update();
