@@ -82,29 +82,23 @@ public class CustomOdometry extends LinearOpMode {
             axial = distanceToX > 6 ? axial * ROBOT_SPEED : axial * SLOW_SPEED;
             lateral = distanceToY > 6 ? lateral * ROBOT_SPEED : lateral * SLOW_SPEED;
 
-            double rotLateral = lateral * Math.cos(-currentHeading) - axial * Math.sin(-currentHeading);
-            double rotAxial = lateral * Math.sin(-currentHeading) + axial * Math.cos(-currentHeading);
-
             // Motor power calculation
-            double leftFrontPower  = rotAxial + rotLateral + yaw;
-            double rightFrontPower = rotAxial - rotLateral - yaw;
-            double leftBackPower   = rotAxial - rotLateral + yaw;
-            double rightBackPower  = rotAxial + rotLateral - yaw;
+            double leftFrontPower  = axial + lateral + yaw;
+            double rightFrontPower = axial - lateral - yaw;
+            double leftBackPower   = axial - lateral + yaw;
+            double rightBackPower  = axial + lateral - yaw;
 
             leftFrontDrive.setPower(leftFrontPower);
             rightFrontDrive.setPower(rightFrontPower);
             leftBackDrive.setPower(leftBackPower);
             rightBackDrive.setPower(rightBackPower);
 
-            // Adding a small delay to allow time for the motors to respond
-            sleep(20);  // Can be adjusted based on your motor responsiveness
-
             // Recheck the distances with tighter thresholds
-            boolean run1 = Math.abs(position.getX(DistanceUnit.INCH) - x) > 0.4;
-            boolean run2 = Math.abs(position.getY(DistanceUnit.INCH) - y) > 0.4;
+            boolean run1 = Math.abs(position.getX(DistanceUnit.INCH) - x) > 0.6;
+            boolean run2 = Math.abs(position.getY(DistanceUnit.INCH) - y) > 0.6;
 
             telem.addData("run1", run1);
-            telem.addData("run2", run2  );
+            telem.addData("run2", run2);
             telem.addData("Target: ", "{X: %.3f, Y: %.3f}", x, y);
             telem.addData("Current: ", "{X: %.3f, Y: %.3f}", currentX, currentY);
             telem.update();
@@ -118,6 +112,10 @@ public class CustomOdometry extends LinearOpMode {
                 turnTo(previousHeading); // Turn to the desired heading once the position is reached
                 return;
             }
+
+
+            // Adding a small delay to allow time for the motors to respond
+            sleep(10);  // Can be adjusted based on your motor responsiveness
         }
     }
 
@@ -335,7 +333,9 @@ public class CustomOdometry extends LinearOpMode {
     }
 
     @Override
-    public void runOpMode() throws InterruptedException {}
+    public void runOpMode() throws InterruptedException {
+        //i LOVE the sleep function
+    }
 }
 
 

@@ -6,14 +6,14 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import org.firstinspires.ftc.teamcode.AutonClasses.Claw;
 import org.firstinspires.ftc.teamcode.AutonClasses.Slide;
 
-@Autonomous(name = "Specimen Right")
-public class RightAuton1 extends LinearOpMode {
+@Autonomous
+public class LeftAuton3 extends LinearOpMode {
+
     CustomOdometry customOdometry;
     Claw claw;
     Slide slide;
-    final private double[] specimenPickup = {3 , -13, 180};
-    final private double[] specimenDropoff = {24 , 10, 0};
-
+    final private double[] bucketLocation = {44 , -4, 35};
+    final private double sampleY = -36.25;
     @Override
     public void runOpMode() throws InterruptedException {
 
@@ -28,20 +28,13 @@ public class RightAuton1 extends LinearOpMode {
         waitForStart();
 
 
-        slide.highRung(false);
-        claw.side();
-
-        customOdometry.moveTo(specimenDropoff[0], specimenDropoff[1], specimenDropoff[2]);
-        telemetry.addData("MOVETOFINISHED", true);
-        telemetry.update();
-        slide.highRungBack(true);
-
-        slide.collection(false);
+        slide.extend(false);
         claw.collect();
-        customOdometry.turnTo(180);
-        customOdometry.moveTo(specimenPickup[0], specimenPickup[1], specimenPickup[2]);
-        claw.reset();
+
+        sleep(2000);
+
+        claw.eject();
+        sleep(2000);
 
     }
 }
-

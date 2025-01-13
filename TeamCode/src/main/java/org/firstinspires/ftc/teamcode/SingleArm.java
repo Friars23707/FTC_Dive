@@ -173,15 +173,15 @@ public class SingleArm extends OpMode {
         if (gamepad2.dpad_down) { //FLOOR INTAKE
             setArmPow(0.5);
             armTarget = 0;
-        } else if (gamepad2.dpad_left) { //SUB INTAKE
-            setArmPow(0.5);
-            armTarget = 150;
-        } else if (gamepad2.dpad_up) { //LOW BASKET
+        } else if (gamepad2.dpad_left) { //LOW BASKET
             setArmPow(0.4);
             armTarget = 1000;
-        } else if (gamepad2.dpad_right) { //HIGH BASKET
+        } else if (gamepad2.dpad_up) { //HIGH BASKET
             setArmPow(0.4);
             armTarget = 1500;
+        } else if (gamepad2.dpad_right) { //HANG
+            setArmPow(0.8);
+            armTarget = 4100;
         } else {
             armTarget = leftArm.getTargetPosition();
         }
@@ -191,6 +191,7 @@ public class SingleArm extends OpMode {
             armTarget = leftArm.getCurrentPosition() - Math.round(gamepad2.left_stick_y*50);
         }
 
+        //armTarget = Math.min(armTarget, 00);
 
         if (gamepad2.right_bumper) {
             leftArm.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
@@ -252,11 +253,11 @@ public class SingleArm extends OpMode {
 
         rightLight.setPosition(lightColor2);
 
-        if (lightColor1 == 0.279 && !redAlliance) {
+        /*if (lightColor1 == 0.279 && !redAlliance) {
             clawPower = 1.0;
         } else if (lightColor1 == 0.611 && redAlliance) {
             clawPower = 1.0;
-        }
+        }*/
 
         claw.setPosition(clawPower);
         wrist.setPosition(wristPos);
@@ -279,6 +280,7 @@ public class SingleArm extends OpMode {
 
     public void setArmPow(double pow) {
         //Set the power for all encoders ((LEFT AND RIGHT ARM MUST MATCH OR KABOOM))
+
         leftArm.setPower(pow);
         rightArm.setPower(pow);
     }
