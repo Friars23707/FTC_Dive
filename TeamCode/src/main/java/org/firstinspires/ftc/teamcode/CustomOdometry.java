@@ -12,7 +12,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.Pose2D;
 
 public class CustomOdometry extends LinearOpMode {
 
-    final double ROBOT_SPEED = 0.35;
+    final double ROBOT_SPEED = 0.5;
     final double SLOW_SPEED = 0.15;
     double previousHeading = 0.0;
 
@@ -77,8 +77,8 @@ public class CustomOdometry extends LinearOpMode {
             double distanceToX = Math.abs(position.getX(DistanceUnit.INCH) - x);
             double distanceToY = Math.abs(position.getY(DistanceUnit.INCH) - y);
 
-            axial = distanceToX > 6 ? axial * ROBOT_SPEED : axial * SLOW_SPEED;
-            lateral = distanceToY > 6 ? lateral * ROBOT_SPEED : lateral * SLOW_SPEED;
+            axial = distanceToX > 8 ? axial * ROBOT_SPEED : axial * SLOW_SPEED;
+            lateral = distanceToY > 8 ? lateral * ROBOT_SPEED : lateral * SLOW_SPEED;
 
             // Motor power calculation
             double leftFrontPower  = axial + lateral + yaw;

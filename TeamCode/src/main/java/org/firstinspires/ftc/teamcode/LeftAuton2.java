@@ -11,7 +11,7 @@ public class LeftAuton2 extends LinearOpMode {
     CustomOdometry customOdometry;
     Claw claw;
     Slide slide;
-    final private double[] bucketLocation = {44 , -4, 35};
+    final private double[] bucketLocation = {44 , -7, 35};
     final private double sampleY = -36.25;
 
     @Override
@@ -35,6 +35,7 @@ public class LeftAuton2 extends LinearOpMode {
         telemetry.addData("MOVETOFINISHED", true);
         telemetry.update();
         claw.eject();
+        sleep(500);
         customOdometry.moveTo(bucketLocation[0]-10, bucketLocation[1]-10, 0);
         slide.retract(false);
 
@@ -49,10 +50,11 @@ public class LeftAuton2 extends LinearOpMode {
         telemetry.addData("MOVETOFINISHED", true);
         telemetry.update();
         claw.eject();
+        sleep(500);
         customOdometry.moveTo(bucketLocation[0]-10, bucketLocation[1]-10, 0);
         slide.retract(false);
 
-        customOdometry.moveTo(36, sampleY, 0);
+        customOdometry.moveTo(33, sampleY, 0);
         slide.collection(false);
         claw.collect();
         customOdometry.moveTo(45   , sampleY, 0);

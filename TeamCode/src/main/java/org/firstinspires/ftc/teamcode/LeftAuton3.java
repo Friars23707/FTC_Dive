@@ -28,10 +28,7 @@ public class LeftAuton3 extends LinearOpMode {
         waitForStart();
 
 
-        slide.extend(false);
-        claw.collect();
-
-        sleep(2000);
+       // slide.extend(false);
 
         claw.eject();
         sleep(2000);
