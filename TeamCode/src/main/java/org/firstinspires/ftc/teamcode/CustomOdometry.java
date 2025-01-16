@@ -13,7 +13,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.Pose2D;
 public class CustomOdometry extends LinearOpMode {
 
     final double ROBOT_SPEED = 0.5;
-    final double SLOW_SPEED = 0.15;
+    final double SLOW_SPEED = 0.17;
     double previousHeading = 0.0;
 
 
