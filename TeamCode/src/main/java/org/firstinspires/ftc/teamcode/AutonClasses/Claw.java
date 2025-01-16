@@ -27,21 +27,21 @@ public class Claw extends LinearOpMode {
     }
 
     public void reset() {
-        wrist.setPosition(0.48);
+        wrist.setPosition(0.5);
         claw.setPosition(0.5);
     }
 
     public void collect() {
 
-        wrist.setPosition(0.48);
+        wrist.setPosition(0.5);
         claw.setPosition(0.0);
 
     }
 
     public void eject() {
 
-        wrist.setPosition(0.48);
-        claw.setPosition(1.0);
+        wrist.setPosition(0.5);
+        claw.setPosition(0.85);
 
     }
     public void side() {

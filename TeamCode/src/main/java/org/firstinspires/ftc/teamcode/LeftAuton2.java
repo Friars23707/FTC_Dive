@@ -11,7 +11,7 @@ public class LeftAuton2 extends LinearOpMode {
     CustomOdometry customOdometry;
     Claw claw;
     Slide slide;
-    final private double[] bucketLocation = {44 , -7, 35};
+    final private double[] bucketLocation = {46 , -5, 40};
     final private double sampleY = -36.25;
 
     @Override
