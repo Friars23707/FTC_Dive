@@ -82,7 +82,7 @@ public class Slide extends LinearOpMode {
             sleep(2000);
         }
 
-    }g
+    }
 
     private int lastArmPos = 0;
 
