@@ -6,8 +6,8 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import org.firstinspires.ftc.teamcode.AutonClasses.Claw;
 import org.firstinspires.ftc.teamcode.AutonClasses.Slide;
 
-@Autonomous(name = "Bucket Left")
-public class LeftAuton2 extends LinearOpMode {
+@Autonomous(name = "Park Test")
+public class ClawTesting extends LinearOpMode {
     CustomOdometry customOdometry;
     Claw claw;
     Slide slide;
@@ -28,31 +28,8 @@ public class LeftAuton2 extends LinearOpMode {
 
         waitForStart();
 
-
         slide.extend(false);
-        claw.collect();
 
-        customOdometry.moveTo(bucketLocation[0], bucketLocation[1], bucketLocation[2]);
-        telemetry.addData("MOVETOFINISHED", true);
-        telemetry.update();
-        claw.eject();
-        sleep(500);
-        customOdometry.moveTo(bucketLocation[0]-10, bucketLocation[1]-10, 0);
-        slide.retract(false);
-
-        customOdometry.moveTo(25, -15, 0);
-        customOdometry.moveTo(25, sampleY, 0);
-        slide.collection(false);
-        claw.collect();
-        customOdometry.moveTo(30, sampleY, 0);
-        sleep(500);
-        slide.extend(false);
-        customOdometry.moveTo(bucketLocation[0]-10, bucketLocation[1]-10, 0);
-        customOdometry.moveTo(bucketLocation[0], bucketLocation[1], bucketLocation[2]);
-        telemetry.addData("MOVETOFINISHED", true);
-        telemetry.update();
-        claw.eject();
-        sleep(500);
         customOdometry.moveTo(bucketLocation[0]-10, bucketLocation[1]-10, 0);
         slide.retract(false);
         sleep(200);
