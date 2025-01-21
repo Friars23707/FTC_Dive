@@ -120,7 +120,7 @@ public class SingleArm extends OpMode {
         // POV Mode uses left joystick to go forward & strafe, and right joystick to rotate.
         double axial   = -gamepad1.left_stick_y;  // Note: pushing stick forward gives negative value
         double lateral =  gamepad1.left_stick_x;
-        double yaw     =  gamepad1.right_stick_x;
+        double yaw     =  gamepad1.right_stick_x/3;
 
         // Combine the joystick requests for each axis-motion to determine each wheel's power.
         // Set up a variable for each drive wheel to save the power level for telemetry.
@@ -130,7 +130,7 @@ public class SingleArm extends OpMode {
         double rightBackPower  = axial + lateral - yaw;
 
         final double WRIST_FOLDED_IN   = 0.12;
-        final double WRIST_FOLDED_OUT  = 0.48;
+        final double WRIST_FOLDED_OUT  = 0.5;
 
 
         // Normalize the values so no wheel power exceeds 100%
@@ -181,7 +181,7 @@ public class SingleArm extends OpMode {
             armTarget = 1500;
         } else if (gamepad2.dpad_right) { //HANG
             setArmPow(0.8);
-            armTarget = 4100;
+            armTarget = 4600;
         } else {
             armTarget = leftArm.getTargetPosition();
         }
@@ -253,11 +253,11 @@ public class SingleArm extends OpMode {
 
         rightLight.setPosition(lightColor2);
 
-        /*if (lightColor1 == 0.279 && !redAlliance) {
+        if (lightColor1 == 0.279 && !redAlliance) {
             clawPower = 1.0;
         } else if (lightColor1 == 0.611 && redAlliance) {
             clawPower = 1.0;
-        }*/
+        }
 
         claw.setPosition(clawPower);
         wrist.setPosition(wristPos);
