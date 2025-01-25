@@ -5,39 +5,37 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 import org.firstinspires.ftc.teamcode.AutonClasses.Slide;
 
-@Autonomous
+@Autonomous(name = "AutoTest", group = "Competition")
 public class AutoTest extends LinearOpMode {
-    CustomOdometry customOdometry;
-    Slide slide;
+    private CustomOdometry odometry;
+    private Slide slide;
 
     @Override
     public void runOpMode() throws InterruptedException {
+        // Initialize hardware
+        odometry = new CustomOdometry();
+        slide = new Slide(hardwareMap);  // Remove if not using slide
 
-        customOdometry = new CustomOdometry();
-        slide = new Slide(hardwareMap);
-        customOdometry.initalize(hardwareMap, telemetry);
-        telemetry.addData("Started", "true");
+        // Initialize odometry system
+        odometry.initialize(hardwareMap, telemetry);
+
+        telemetry.addData("Status", "Initialized");
         telemetry.update();
 
         waitForStart();
-        while (!isStopRequested()) {
-            /*customOdometry.turnTo(45);
-            sleep(600);
-            customOdometry.moveTo(5, 5);
-            sleep(600);
-            customOdometry.moveTo(0, 0);
-            sleep(600);
-            customOdometry.turnTo(0);
-            sleep(600);
-            customOdometry.moveTo(-5, -5);
-            sleep(600);*/
 
-            customOdometry.moveToWithHeading(5, 5, 45);
-            sleep(4000);
-            customOdometry.moveToWithHeading(0, 0, -45);
-            sleep(4000);
+        // Main autonomous sequence
+        if (opModeIsActive()) {
+            // First movement: 5 inches X, 5 inches Y, 45° heading
+            odometry.moveTo(5.0, 5.0, 45.0);
+
+            // Second movement: Return to origin with -45° heading
+            odometry.moveTo(0.0, 0.0, -45.0);
         }
 
+        // Add any end-of-auto cleanup here
+        telemetry.addData("Status", "Complete");
+        telemetry.update();
     }
 }
 
