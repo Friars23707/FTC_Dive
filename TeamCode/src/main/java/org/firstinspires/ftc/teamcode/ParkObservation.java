@@ -16,7 +16,7 @@ public class ParkObservation extends LinearOpMode {
     @Override
     public void runOpMode() throws InterruptedException {
         customOdometry = new CustomOdometry();
-        customOdometry.initalize(hardwareMap, telemetry);
+        customOdometry.initialize(hardwareMap, telemetry);
         claw = new Claw(hardwareMap);
         slide = new Slide(hardwareMap);
 

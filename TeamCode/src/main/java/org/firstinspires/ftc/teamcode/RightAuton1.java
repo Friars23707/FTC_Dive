@@ -18,7 +18,7 @@ public class RightAuton1 extends LinearOpMode {
     public void runOpMode() throws InterruptedException {
 
         customOdometry = new CustomOdometry();
-        customOdometry.initalize(hardwareMap, telemetry);
+        customOdometry.initialize(hardwareMap, telemetry);
         claw = new Claw(hardwareMap);
         slide = new Slide(hardwareMap);
 
